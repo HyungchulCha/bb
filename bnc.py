@@ -62,9 +62,8 @@ class BotBinance():
         prc_ttl, prc_lmt, _, bal_lst  = self.get_balance_info()
         self.b_l = list(set(self.q_l + bal_lst))
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
-        self.prc_ttl = 6400
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
-        prc_buy = self.prc_ttl / (len(self.q_l) * 3)
+        prc_buy = self.prc_ttl / (len(self.q_l) * 2)
         self.prc_buy = prc_buy if prc_buy > self.const_dn else self.const_dn
 
         if os.path.isfile(FILE_URL_TIKR_3M):
