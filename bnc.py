@@ -21,6 +21,7 @@ class BotBinance():
         
         self.q_l = []
         self.b_l = []
+        self.r_l = []
         self.o_l = {}
 
         self.time_order = None
@@ -61,6 +62,7 @@ class BotBinance():
         self.q_l = self.get_filter_ticker()
         prc_ttl, prc_lmt, _, bal_lst  = self.get_balance_info()
         self.b_l = list(set(self.q_l + bal_lst))
+        self.r_l = list(set(bal_lst).difference(self.q_l))
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
         prc_buy = self.prc_ttl / (len(self.q_l) * 2.25)
@@ -198,6 +200,7 @@ class BotBinance():
                 if (rsi <= 30) and (rsi_prev > rsi) and (volume_osc > 0):
                     
                     is_psb_ord = float(self.bnc.fetch_balance()['USDT']['free']) > self.prc_buy
+                    is_remain_symbol = symbol in self.r_l
                     buy_qty = float(self.prc_buy / cur_prc)
 
                     if is_psb_ord:
@@ -268,7 +271,7 @@ class BotBinance():
 
         
         lst = sorted(lst, key=lambda x: x['v'])
-        lst = lst[-100:]
+        lst = lst[-90:]
         lst = [t['t'] for t in lst]
 
         return lst
