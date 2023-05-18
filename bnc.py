@@ -248,10 +248,10 @@ class BotBinance():
         for tk in tks:
             resp = self.bnc.fetch_ticker(tk)
             lst.append({'t': tk, 'v': float(resp['info']['quoteVolume'])})
-        lst = sorted(lst, key=lambda x: x['v'])
+        lst = sorted(lst, key=lambda x: x['v'])[-80:]
         lst = [t['t'] for t in lst]
 
-        return lst[-80:]
+        return lst
     
 
     # Strategy RSI
