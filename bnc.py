@@ -154,6 +154,10 @@ class BotBinance():
                     ol_bool_sell = copy.deepcopy(self.o_l[symbol]['bool_sell'])
                     ol_70_position = copy.deepcopy(self.o_l[symbol]['70_position'])
                     sell_qty = bl_balance * (1 / ol_quantity_ratio)
+                    is_psb_sel_div = (cur_prc * sell_qty) > self.const_dn
+
+                    if (not is_psb_sel_div) and ol_quantity_ratio > 1:
+                        sell_qty = bl_balance * (1 / ol_quantity_ratio - 1)
 
                     if rsi <= 50 and ol_bool_sell:
                         self.bnc.create_market_sell_order(symbol=symbol, amount=bl_balance)
@@ -173,6 +177,9 @@ class BotBinance():
                         self.bnc.create_market_sell_order(symbol=symbol, amount=sell_qty)
                         self.o_l[symbol]['quantity_ratio'] = ol_quantity_ratio - 1
                         self.o_l[symbol]['bool_sell'] = True
+
+                        if (not is_psb_sel_div) and ol_quantity_ratio > 1:
+                            self.o_l[symbol]['quantity_ratio'] = ol_quantity_ratio - 2
 
                         if self.o_l[symbol]['quantity_ratio'] == 0:
                             self.o_l[symbol] = {
