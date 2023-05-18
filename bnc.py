@@ -203,7 +203,7 @@ class BotBinance():
                     is_remain_symbol = symbol in self.r_l
                     buy_qty = float(self.prc_buy / cur_prc)
 
-                    if is_psb_ord:
+                    if is_psb_ord and (not is_remain_symbol):
 
                         self.bnc.create_market_buy_order(symbol=symbol, amount=buy_qty)
                         ol_bool_buy = copy.deepcopy(self.o_l[symbol]['bool_buy'])
