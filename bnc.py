@@ -261,7 +261,7 @@ class BotBinance():
 
         
         lst = sorted(lst, key=lambda x: x['v'])
-        lst = lst[-80:]
+        lst = lst[-100:]
         lst = [t['t'] for t in lst]
 
         return lst
