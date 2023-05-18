@@ -191,7 +191,7 @@ class BotBinance():
 
                         if ol_bool_buy:
                             self.o_l[symbol]['buy_price'] = cur_prc
-                            self.o_l[symbol]['quantity_ratio'] = ol_quantity_ratio * 2
+                            self.o_l[symbol]['quantity_ratio'] = ol_quantity_ratio + 2
                         else:
                             self.o_l[symbol] = {
                                 'bool_buy': True,
