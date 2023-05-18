@@ -130,11 +130,21 @@ class BotBinance():
                 volume_osc = df_h['volume_osc'].iloc[-1]
 
                 cur_prc = float(close)
-
             
                 is_symbol_bal = symbol in bal_lst
                 is_psb_sel = (is_symbol_bal and (cur_prc * bal_lst[symbol]['b'] > self.const_dn))
                 ol_bool_buy = copy.deepcopy(self.o_l[symbol]['bool_buy'])
+                is_nothing = ol_bool_buy and ((not is_symbol_bal) or (is_symbol_bal and (cur_prc * bal_lst[symbol]['b'] < self.const_dn)))
+
+                if is_nothing:
+
+                    self.o_l[symbol] = {
+                        'bool_buy': False,
+                        'buy_price': 0,
+                        'quantity_ratio': 0,
+                        'bool_sell': False,
+                        '70_position': ''
+                    }
 
                 if is_psb_sel and ol_bool_buy:
 
