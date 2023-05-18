@@ -14,7 +14,7 @@ class BotBinance():
 
     def __init__(self):
 
-        self.is_aws = True
+        self.is_aws = False
         self.access_key = BN_ACCESS_KEY_AWS if self.is_aws else BN_ACCESS_KEY_NAJU
         self.secret_key = BN_SECRET_KEY_AWS if self.is_aws else BN_SECRET_KEY_NAJU
         self.bnc = ccxt.binance(config={'apiKey': self.access_key, 'secret': self.secret_key, 'enableRateLimit': True})
@@ -47,10 +47,10 @@ class BotBinance():
             tn_d = int(((tn - tn_0).seconds) % 300)
             print(f'{tn_d} Second')
 
-            if tn_d <= 150:
-                time.sleep(300 - tn_d - 150)
-            else:
-                time.sleep(300 - tn_d + 150)
+            # if tn_d <= 150:
+            #     time.sleep(300 - tn_d - 150)
+            # else:
+            #     time.sleep(300 - tn_d + 150)
 
             self.bool_balance = True
 
@@ -235,6 +235,7 @@ class BotBinance():
         mks = self.bnc.load_markets()
         tks = []
         lst = []
+
         for mk in mks:
             if \
             mk.endswith('/USDT') and \
@@ -248,7 +249,10 @@ class BotBinance():
         for tk in tks:
             resp = self.bnc.fetch_ticker(tk)
             lst.append({'t': tk, 'v': float(resp['info']['quoteVolume'])})
-        lst = sorted(lst, key=lambda x: x['v'])[-80:]
+
+        
+        lst = sorted(lst, key=lambda x: x['v'])
+        lst = lst[-80:]
         lst = [t['t'] for t in lst]
 
         return lst
@@ -327,23 +331,23 @@ class BotBinance():
 if __name__ == '__main__':
 
     bb = BotBinance()
-    # bb.init_per_day()
+    bb.init_per_day()
     # bb.stock_order()
     # bb.all_sell_order()
 
-    while True:
+    # while True:
 
-        try:
+    #     try:
 
-            tn = datetime.datetime.now()
-            tn_start = tn.replace(hour=0, minute=0, second=0)
+    #         tn = datetime.datetime.now()
+    #         tn_start = tn.replace(hour=0, minute=0, second=0)
 
-            if tn >= tn_start and bb.bool_start == False:
-                bb.init_per_day()
-                bb.stock_order()
-                bb.bool_start = True
+    #         if tn >= tn_start and bb.bool_start == False:
+    #             bb.init_per_day()
+    #             bb.stock_order()
+    #             bb.bool_start = True
 
-        except Exception as e:
+    #     except Exception as e:
 
-            line_message(f"BotBinance Error : {e}")
-            break
+    #         line_message(f"BotBinance Error : {e}")
+    #         break
