@@ -66,7 +66,7 @@ class BotBinance():
         self.r_l = list(set(bal_lst).difference(self.q_l))
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
-        prc_buy = self.prc_ttl / (len(self.q_l) * 3)
+        prc_buy = self.prc_ttl / (len(self.q_l) * 2)
         self.prc_buy = prc_buy if prc_buy > self.const_dn else self.const_dn
 
         if os.path.isfile(FILE_URL_TIKR_3M):
@@ -143,8 +143,7 @@ class BotBinance():
                     bl_balance = copy.deepcopy(bal_lst[symbol]['b'])
                     ol_buy_price = copy.deepcopy(self.o_l[symbol]['buy_price'])
                     ol_quantity_ratio = copy.deepcopy(self.o_l[symbol]['quantity_ratio'])
-                    ol_bool_sell_1n = copy.deepcopy(self.o_l[symbol]['bool_sell_1n'])
-                    ol_bool_sell_2p = copy.deepcopy(self.o_l[symbol]['bool_sell_2p'])
+                    ol_bool_sell = copy.deepcopy(self.o_l[symbol]['bool_sell'])
                     ol_70_position = copy.deepcopy(self.o_l[symbol]['70_position'])
                     sell_qty = bl_balance * (1 / ol_quantity_ratio)
                     is_psb_sel_div = (cur_prc * sell_qty) > self.const_dn
@@ -152,25 +151,9 @@ class BotBinance():
                     if (not is_psb_sel_div) and ol_quantity_ratio > 1:
                         sell_qty = bl_balance * (1 / ol_quantity_ratio - 1)
 
-                    if rsi <= 50 and ol_bool_sell_1n:
+                    if rsi <= 50 and ol_bool_sell:
                         self.bnc.create_market_sell_order(symbol=symbol, amount=bl_balance)
                         self.get_tiker_data_init(symbol)
-
-                        _ror = get_ror(ol_buy_price, cur_prc)
-                        print(f'Sell - Symbol: {symbol}, Profit: {round(_ror, 4)}')
-                        sel_lst.append({'c': '[S] ' + symbol, 'r': round(_ror, 4)})
-                    
-                    elif (cur_prc / ol_buy_price) >= 1.02 and (not ol_bool_sell_2p):
-                        self.bnc.create_market_sell_order(symbol=symbol, amount=sell_qty)
-                        self.o_l[symbol]['quantity_ratio'] = ol_quantity_ratio - 1
-                        self.o_l[symbol]['bool_sell_1n'] = True
-                        self.o_l[symbol]['bool_sell_2p'] = True
-
-                        if (not is_psb_sel_div) and ol_quantity_ratio > 1:
-                            self.o_l[symbol]['quantity_ratio'] = ol_quantity_ratio - 2
-
-                        if self.o_l[symbol]['quantity_ratio'] == 0:
-                            self.get_tiker_data_init(symbol)
 
                         _ror = get_ror(ol_buy_price, cur_prc)
                         print(f'Sell - Symbol: {symbol}, Profit: {round(_ror, 4)}')
@@ -179,7 +162,7 @@ class BotBinance():
                     elif rsi >= 70 and ((ol_70_position == '70_down') or (ol_70_position == '70_up' and (rsi_prev < rsi))):
                         self.bnc.create_market_sell_order(symbol=symbol, amount=sell_qty)
                         self.o_l[symbol]['quantity_ratio'] = ol_quantity_ratio - 1
-                        self.o_l[symbol]['bool_sell_1n'] = True
+                        self.o_l[symbol]['bool_sell'] = True
 
                         if (not is_psb_sel_div) and ol_quantity_ratio > 1:
                             self.o_l[symbol]['quantity_ratio'] = ol_quantity_ratio - 2
@@ -212,7 +195,7 @@ class BotBinance():
                                 'bool_buy': True,
                                 'buy_price': cur_prc,
                                 'quantity_ratio': 2,
-                                'bool_sell_1n': False,
+                                'bool_sell': False,
                                 'bool_sell_2p': False,
                                 '70_position': ''
                             }
@@ -251,7 +234,7 @@ class BotBinance():
             'bool_buy': False,
             'buy_price': 0,
             'quantity_ratio': 0,
-            'bool_sell_1n': False,
+            'bool_sell': False,
             'bool_sell_2p': False,
             '70_position': ''
         }
@@ -279,7 +262,7 @@ class BotBinance():
 
         
         lst = sorted(lst, key=lambda x: x['v'])
-        lst = lst[-40:]
+        lst = lst[-60:]
         lst = [t['t'] for t in lst]
 
         return lst
