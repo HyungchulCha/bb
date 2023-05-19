@@ -36,6 +36,7 @@ class BotBinance():
         self.prc_buy = 0
 
         self.const_up = 377500
+        self.const_up = 3750
         self.const_dn = 12.5
 
     
@@ -64,7 +65,6 @@ class BotBinance():
         self.b_l = list(set(self.q_l + bal_lst))
         self.r_l = list(set(bal_lst).difference(self.q_l))
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
-        self.prc_ttl = 3750
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
         prc_buy = self.prc_ttl / (len(self.q_l) * 3)
         self.prc_buy = prc_buy if prc_buy > self.const_dn else self.const_dn
@@ -115,7 +115,7 @@ class BotBinance():
 
         for symbol in self.b_l:
 
-            df = self.strategy_rsi(self.gen_bnc_df(symbol, '5m', 30))
+            df = self.strategy_rsi(self.gen_bnc_df(symbol, '5m', 120))
             is_df = not (df is None)
 
             if is_df:
@@ -127,6 +127,8 @@ class BotBinance():
                 volume_osc = df_h['volume_osc'].iloc[-1]
 
                 cur_prc = float(close)
+
+                print(symbol, rsi, rsi_prev, volume_osc, close)
             
                 is_symbol_bal = symbol in bal_lst
                 is_psb_sel = (is_symbol_bal and (cur_prc * bal_lst[symbol]['b'] > self.const_dn))
