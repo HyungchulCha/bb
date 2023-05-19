@@ -66,7 +66,7 @@ class BotBinance():
         self.r_l = list(set(bal_lst).difference(self.q_l))
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
-        prc_buy = self.prc_ttl / (len(self.q_l) * 3)
+        prc_buy = self.prc_ttl / (len(self.q_l) * 2)
         self.prc_buy = prc_buy if prc_buy > self.const_dn else self.const_dn
 
         if os.path.isfile(FILE_URL_TIKR_3M):
@@ -125,6 +125,11 @@ class BotBinance():
                 rsi = df_h['rsi'].iloc[-1]
                 rsi_prev = df_h['rsi_prev'].iloc[-1]
                 volume_osc = df_h['volume_osc'].iloc[-1]
+
+                str_rsi = round(rsi, 2)
+                str_rsi_prev = round(rsi_prev, 2)
+                str_volume_osc = round(volume_osc, 2)
+                print(f'{symbol} : RSI - {str_rsi}, RSI_P - {str_rsi_prev}, VO - {str_volume_osc}')
 
                 cur_prc = float(close)
             
@@ -259,7 +264,7 @@ class BotBinance():
             volume = float(df['volume'].iloc[-1])
             lst.append({'t': tk, 'v': volume})
 
-        lst = sorted(lst, key=lambda x: x['v'])[-50:]
+        lst = sorted(lst, key=lambda x: x['v'])[-80:]
         lst = [t['t'] for t in lst]
 
         return lst
