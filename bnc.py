@@ -207,7 +207,9 @@ class BotBinance():
 
 
         save_file(FILE_URL_TIKR_3M, self.o_l)
-        # print(self.o_l)
+        for o in self.o_l:
+            if self.o_l[o]['bool_buy'] == True:
+                print(o, self.o_l[o], '\n')
 
         sel_txt = ''
         for sl in sel_lst:
@@ -258,7 +260,7 @@ class BotBinance():
             df = self.gen_bnc_df(tk, '1d', 1)
             volume = float(df['volume'].iloc[-1])
             lst.append({'t': tk, 'v': volume})
-            
+
         lst = sorted(lst, key=lambda x: x['v'])[-50:]
         lst = [t['t'] for t in lst]
 
