@@ -194,7 +194,6 @@ class BotBinance():
                                 'buy_price': cur_prc,
                                 'quantity_ratio': 2,
                                 'bool_sell': False,
-                                'bool_sell_2p': False,
                                 '70_position': ''
                             }
 
