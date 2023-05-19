@@ -127,8 +127,6 @@ class BotBinance():
                 volume_osc = df_h['volume_osc'].iloc[-1]
 
                 cur_prc = float(close)
-
-                print(symbol, rsi, rsi_prev, volume_osc, close)
             
                 is_symbol_bal = symbol in bal_lst
                 is_psb_sel = (is_symbol_bal and (cur_prc * bal_lst[symbol]['b'] > self.const_dn))
@@ -208,7 +206,7 @@ class BotBinance():
 
 
         save_file(FILE_URL_TIKR_3M, self.o_l)
-        print(self.o_l)
+        # print(self.o_l)
 
         sel_txt = ''
         for sl in sel_lst:
@@ -235,7 +233,6 @@ class BotBinance():
             'buy_price': 0,
             'quantity_ratio': 0,
             'bool_sell': False,
-            'bool_sell_2p': False,
             '70_position': ''
         }
 
