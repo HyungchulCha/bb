@@ -255,9 +255,10 @@ class BotBinance():
                 tks.append(mk)
 
         for tk in tks:
-            resp = self.bnc.fetch_ticker(tk)
-            lst.append({'t': tk, 'v': float(resp['info']['quoteVolume'])})
-        
+            df = self.gen_bnc_df(tk, '1d', 1)
+            volume = float(df['volume'].iloc[-1])
+            lst.append({'t': tk, 'v': volume})
+            
         lst = sorted(lst, key=lambda x: x['v'])[-50:]
         lst = [t['t'] for t in lst]
 
