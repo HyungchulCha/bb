@@ -260,7 +260,7 @@ class BotBinance():
                 tks.append(mk)
 
         for tk in tks:
-            df = self.gen_bnc_df(tk, '1d', 1)
+            df = self.gen_bnc_df(tk, '1w', 1)
             volume = float(df['volume'].iloc[-1])
             lst.append({'t': tk, 'v': volume})
 
