@@ -36,7 +36,7 @@ class BotBinance():
         self.prc_buy = 0
 
         self.const_up = 377500
-        self.const_up = 7000
+        self.const_up = 8000
         self.const_dn = 12.5
 
     
