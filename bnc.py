@@ -36,7 +36,7 @@ class BotBinance():
         self.prc_buy = 0
 
         self.const_up = 377500
-        self.const_up = 8500
+        self.const_up = 13000
         self.const_dn = 12.5
 
     
@@ -264,7 +264,7 @@ class BotBinance():
             volume = float(df['volume'].iloc[-1])
             lst.append({'t': tk, 'v': volume})
 
-        lst = sorted(lst, key=lambda x: x['v'])[-80:]
+        lst = sorted(lst, key=lambda x: x['v'])[-100:]
         lst = [t['t'] for t in lst]
 
         return lst
