@@ -138,6 +138,11 @@ class BotBinance():
                 ol_bool_buy = copy.deepcopy(self.o_l[symbol]['bool_buy'])
                 is_nothing = ol_bool_buy and ((not is_symbol_bal) or (is_symbol_bal and (cur_prc * bal_lst[symbol]['b'] < self.const_dn)))
 
+                if symbol == 'BNB/USDT' and (symbol in bal_lst) and (cur_prc * bal_lst[symbol]['b'] > self.const_dn) and (rsi >= 70):
+                    bl_balance = copy.deepcopy(bal_lst[symbol]['b'])
+                    self.bnc.create_market_sell_order(symbol=symbol, amount=bl_balance)
+                    self.get_tiker_data_init(symbol)
+
                 if is_nothing:
                     self.get_tiker_data_init(symbol)
 
