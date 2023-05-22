@@ -22,7 +22,7 @@ class BotBinance():
         self.q_l = []
         self.b_l = []
         self.r_l = []
-        self.x_l = ['PROS/USDT','DOCK/USDT','UNI/USDT','GMT/USDT','APT/USDT','ONE/USDT','CTXC/USDT','TWT/USDT','ICP/USDT','INJ/USDT','LAZIO/USDT','TFUEL/USDT','WAN/USDT','LINK/USDT','NMR/USDT','ALGO/USDT','BTC/USDT','MTL/USDT','ALPINE/USDT','AERGO/USDT','WAXP/USDT','STMX/USDT','EOS/USDT','MC/USDT','XVG/USDT','CKB/USDT','POLS/USDT','XEM/USDT','SCRT/USDT','MOB/USDT','MINA/USDT','JST/USDT','CLV/USDT','ANT/USDT','OSMO/USDT','PERL/USDT','USDP/USDT','ZEC/USDT','EUR/USDT','DCR/USDT','UTK/USDT','TUSD/USDT','BTTC/USDT','BUSD/USDT','USDC/USDT','SUN/USDT']
+        self.t_l = ['LQTY/USDT','HIGH/USDT','FXS/USDT','ASR/USDT','ACH/USDT','GRT/USDT','LDO/USDT','TOMO/USDT','RDNT/USDT','SNX/USDT','PYR/USDT','RLC/USDT','CTSI/USDT','CHESS/USDT','BEL/USDT','IOTX/USDT','SYN/USDT','PEPE/USDT','RIF/USDT','ONT/USDT','ARPA/USDT','GALA/USDT','KMD/USDT','EPX/USDT','PEOPLE/USDT','RSR/USDT','BTS/USDT','FLUX/USDT','CRV/USDT','NKN/USDT','COCOS/USDT','BOND/USDT','TKO/USDT','GAL/USDT','AUDIO/USDT','RPL/USDT','SUSHI/USDT','WTC/USDT','KAVA/USDT','CVP/USDT','PHB/USDT','WRX/USDT','RAD/USDT','ATM/USDT','MASK/USDT','POND/USDT','DEGO/USDT','AKRO/USDT','ELF/USDT','BAL/USDT','ILV/USDT','FLM/USDT','CELO/USDT','RNDR/USDT','UNFI/USDT','DUSK/USDT','GAS/USDT','KEY/USDT','ACM/USDT','DODO/USDT','SANTOS/USDT','REN/USDT','QUICK/USDT','PORTO/USDT','CHR/USDT','SPELL/USDT','BAT/USDT','JUV/USDT','TLM/USDT','BCH/USDT','PSG/USDT','CFX/USDT','OMG/USDT','C98/USDT','VIB/USDT','ATA/USDT','ENS/USDT','DF/USDT','TVK/USDT','OM/USDT']
         self.o_l = {}
 
         self.time_order = None
@@ -65,7 +65,7 @@ class BotBinance():
         self.b_l = list(set(self.q_l + bal_lst))
         self.r_l = list(set(bal_lst).difference(self.q_l))
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
-        self.prc_ttl = 14400
+        self.prc_ttl = 18100 * 0.8
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
         prc_buy = self.prc_ttl / (len(self.q_l) * 6)
         self.prc_buy = prc_buy if prc_buy > self.const_dn else self.const_dn
@@ -88,7 +88,7 @@ class BotBinance():
         len_bal_lst = len(self.b_l)
         len_rmn_lst = len(self.r_l)
 
-        line_message(f'BotBinance \nTotal Price : {int_prc_ttl:,} USDT \nLimit Price : {int_prc_lmt:,} USDT \nSymbol List : {len_bal_lst} \nOther List : {len_rmn_lst}')
+        line_message(f'BotBinance \nTotal Price : {int_prc_ttl:,} USDT \nLimit Price : {int_prc_lmt:,} USDT \nSymbol List : {len_bal_lst} \nOther List : {len_rmn_lst} \n{self.r_l}')
 
         __tn = datetime.datetime.now()
         __tn_min = __tn.minute % 5
@@ -162,7 +162,7 @@ class BotBinance():
 
                         _ror = get_ror(ol_buy_price, cur_prc)
                         print(f'Sell - Symbol: {symbol}, Profit: {round(_ror, 4)}')
-                        sel_lst.append({'c': '[S] ' + symbol, 'r': round(_ror, 4)})
+                        sel_lst.append({'c': '[S&] ' + symbol, 'r': round(_ror, 4)})
 
                     elif rsi >= 70 and ((ol_70_position == '70_down') or (ol_70_position == '70_up' and (rsi_prev <= rsi))):
                         self.bnc.create_market_sell_order(symbol=symbol, amount=sell_qty)
@@ -177,24 +177,24 @@ class BotBinance():
 
                         _ror = get_ror(ol_buy_price, cur_prc)
                         print(f'Sell - Symbol: {symbol}, Profit: {round(_ror, 4)}')
-                        sel_lst.append({'c': '[S] ' + symbol, 'r': round(_ror, 4)})
+                        sel_lst.append({'c': '[S+] ' + symbol, 'r': round(_ror, 4)})
                         
 
                 if (rsi <= 30) and (rsi_prev > rsi) and (volume_osc > 0):
                     
                     is_psb_ord = float(self.bnc.fetch_balance()['USDT']['free']) > self.prc_buy
                     is_remain_symbol = symbol in self.r_l
-                    is_black_symbol = symbol in self.x_l
                     buy_qty = float(self.prc_buy / cur_prc)
 
-                    if is_psb_ord and (not is_remain_symbol) and (not is_black_symbol):
+                    if is_psb_ord and (not is_remain_symbol):
 
                         self.bnc.create_market_buy_order(symbol=symbol, amount=buy_qty)
                         ol_bool_buy = copy.deepcopy(self.o_l[symbol]['bool_buy'])
+                        ol_buy_price = copy.deepcopy(self.o_l[symbol]['buy_price'])
                         ol_quantity_ratio = copy.deepcopy(self.o_l[symbol]['quantity_ratio'])
 
                         if ol_bool_buy:
-                            self.o_l[symbol]['buy_price'] = cur_prc
+                            self.o_l[symbol]['buy_price'] = ((ol_buy_price * (ol_quantity_ratio - 1)) + cur_prc) / ol_quantity_ratio
                             self.o_l[symbol]['quantity_ratio'] = ol_quantity_ratio + 1
                         else:
                             self.o_l[symbol] = {
@@ -254,6 +254,7 @@ class BotBinance():
 
         for mk in mks:
             if \
+            mk in self.t_l and \
             mk.endswith('/USDT') and \
             mks[mk]['active'] == True and \
             mks[mk]['info']['status'] == 'TRADING' and \
@@ -262,18 +263,20 @@ class BotBinance():
             :
                 tks.append(mk)
 
-        _tks = list(set(tks).difference(self.x_l))
+        return tks
 
-        for tk in _tks:
-            df = self.gen_bnc_df(tk, '1w', 2)
-            _df = df.head(1)
-            volume = float(_df['volume'].iloc[-1])
-            lst.append({'t': tk, 'v': volume})
+        # _tks = list(set(tks).difference(self.x_l))
 
-        lst = sorted(lst, key=lambda x: x['v'])[-80:]
-        lst = [t['t'] for t in lst]
+        # for tk in _tks:
+        #     df = self.gen_bnc_df(tk, '1w', 2)
+        #     _df = df.head(1)
+        #     volume = float(_df['volume'].iloc[-1])
+        #     lst.append({'t': tk, 'v': volume})
 
-        return lst
+        # lst = sorted(lst, key=lambda x: x['v'])
+        # lst = [t['t'] for t in lst]
+
+        # return lst
     
 
     # Strategy RSI
