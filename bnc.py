@@ -22,6 +22,7 @@ class BotBinance():
         self.q_l = []
         self.b_l = []
         self.r_l = []
+        self.x_l = ['PROS/USDT','DOCK/USDT','UNI/USDT','GMT/USDT','APT/USDT','ONE/USDT','CTXC/USDT','TWT/USDT','ICP/USDT','INJ/USDT','LAZIO/USDT','TFUEL/USDT','WAN/USDT','LINK/USDT','NMR/USDT','ALGO/USDT','BTC/USDT','MTL/USDT','ALPINE/USDT','AERGO/USDT','WAXP/USDT','STMX/USDT','EOS/USDT','MC/USDT','XVG/USDT','CKB/USDT','POLS/USDT','XEM/USDT','SCRT/USDT','MOB/USDT','MINA/USDT','JST/USDT','CLV/USDT','ANT/USDT','XTZ/USDT','OSMO/USDT','PERL/USDT','USDP/USDT','ZEC/USDT','EUR/USDT','DCR/USDT','PEPE/USDT','UTK/USDT','TUSD/USDT','BTTC/USDT','BUSD/USDT','USDC/USDT','SUN/USDT']
         self.o_l = {}
 
         self.time_order = None
@@ -183,9 +184,10 @@ class BotBinance():
                     
                     is_psb_ord = float(self.bnc.fetch_balance()['USDT']['free']) > self.prc_buy
                     is_remain_symbol = symbol in self.r_l
+                    is_black_symbol = symbol in self.x_l
                     buy_qty = float(self.prc_buy / cur_prc)
 
-                    if is_psb_ord and (not is_remain_symbol):
+                    if is_psb_ord and (not is_remain_symbol) and (not is_black_symbol):
 
                         self.bnc.create_market_buy_order(symbol=symbol, amount=buy_qty)
                         ol_bool_buy = copy.deepcopy(self.o_l[symbol]['bool_buy'])
