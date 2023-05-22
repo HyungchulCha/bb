@@ -77,7 +77,7 @@ class BotBinance():
             save_file(FILE_URL_TIKR_3M, self.o_l)
 
         for tk in self.b_l:
-            if not (tk in self.o_l):
+            if (not (tk in self.o_l)) or ((tk in self.o_l) and (self.o_l[tk]['bool_buy'] == True) and (not (tk in bal_lst))):
                 self.get_tiker_data_init(tk)
 
         if self.prc_lmt < self.prc_buy:
