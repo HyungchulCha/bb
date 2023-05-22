@@ -138,7 +138,7 @@ class BotBinance():
 
         prft_df = pd.DataFrame({'code': ttl_code_array, 'profit': ttl_prft_array})
         prft_df = prft_df.sort_values('profit', ascending=False)
-        toptier_list = prft_df.head(80)['code'].to_list()
+        toptier_list = prft_df.head(100)['code'].to_list()
         save_file(FILE_URL_TPTR_3M, toptier_list)
 
     
