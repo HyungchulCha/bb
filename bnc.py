@@ -261,8 +261,9 @@ class BotBinance():
                 tks.append(mk)
 
         for tk in tks:
-            df = self.gen_bnc_df(tk, '1w', 1)
-            volume = float(df['volume'].iloc[-1])
+            df = self.gen_bnc_df(tk, '1w', 2)
+            _df = df.head(1)
+            volume = float(_df['volume'].iloc[-1])
             lst.append({'t': tk, 'v': volume})
 
         lst = sorted(lst, key=lambda x: x['v'])[-80:]
