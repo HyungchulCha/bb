@@ -24,6 +24,7 @@ FILE_URL = DIRECTORY + '/_d'
 FILE_URL_BLNC_3M = FILE_URL + '/BalanceList.pickle'
 FILE_URL_TIKR_3M = FILE_URL + '/TickerRealStatus.pickle'
 FILE_URL_PRFT_3M = FILE_URL + '/ProfitList.pickle'
+FILE_URL_TPTR_3M = FILE_URL + '/TopTierList.pickle'
 
 FILE_URL_TEST = DIRECTORY + '/_d_t'
 FILE_URL_TEST_TIKR_3M = FILE_URL_TEST + '/TestTickerList.pickle'

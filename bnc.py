@@ -22,7 +22,7 @@ class BotBinance():
         self.q_l = []
         self.b_l = []
         self.r_l = []
-        self.t_l = ['LQTY/USDT','HIGH/USDT','FXS/USDT','ASR/USDT','ACH/USDT','GRT/USDT','LDO/USDT','TOMO/USDT','RDNT/USDT','SNX/USDT','PYR/USDT','RLC/USDT','CTSI/USDT','CHESS/USDT','BEL/USDT','IOTX/USDT','SYN/USDT','PEPE/USDT','RIF/USDT','ONT/USDT','ARPA/USDT','GALA/USDT','KMD/USDT','EPX/USDT','PEOPLE/USDT','RSR/USDT','BTS/USDT','FLUX/USDT','CRV/USDT','NKN/USDT','COCOS/USDT','BOND/USDT','TKO/USDT','GAL/USDT','AUDIO/USDT','RPL/USDT','SUSHI/USDT','WTC/USDT','KAVA/USDT','CVP/USDT','PHB/USDT','WRX/USDT','RAD/USDT','ATM/USDT','MASK/USDT','POND/USDT','DEGO/USDT','AKRO/USDT','ELF/USDT','BAL/USDT','ILV/USDT','FLM/USDT','CELO/USDT','RNDR/USDT','UNFI/USDT','DUSK/USDT','GAS/USDT','KEY/USDT','ACM/USDT','DODO/USDT','SANTOS/USDT','REN/USDT','QUICK/USDT','PORTO/USDT','CHR/USDT','SPELL/USDT','BAT/USDT','JUV/USDT','TLM/USDT','BCH/USDT','PSG/USDT','CFX/USDT','OMG/USDT','C98/USDT','VIB/USDT','ATA/USDT','ENS/USDT','DF/USDT','TVK/USDT','OM/USDT']
+        self.t_l = ['HIGH/USDT', 'LQTY/USDT', 'FXS/USDT', 'ACH/USDT', 'ASR/USDT', 'TOMO/USDT', 'CTSI/USDT', 'PYR/USDT', 'SYN/USDT', 'BEL/USDT', 'IOTX/USDT', 'ONT/USDT', 'KMD/USDT', 'ARPA/USDT', 'SNX/USDT', 'UTK/USDT', 'RLC/USDT', 'CHESS/USDT', 'LDO/USDT', 'PEOPLE/USDT', 'BTS/USDT', 'AUDIO/USDT', 'CRV/USDT', 'COCOS/USDT', 'RNDR/USDT', 'TKO/USDT', 'RSR/USDT', 'RPL/USDT', 'FLUX/USDT', 'REN/USDT', 'RIF/USDT', 'DREP/USDT', 'NKN/USDT', 'OCEAN/USDT', 'SUSHI/USDT', 'WTC/USDT', 'KAVA/USDT', 'PSG/USDT', 'RAD/USDT', 'CVP/USDT', 'SSV/USDT', 'WRX/USDT', 'GALA/USDT', 'ATM/USDT', 'MASK/USDT', 'POND/USDT', 'CFX/USDT', 'BAL/USDT', 'FLM/USDT', 'DUSK/USDT', 'ELF/USDT', 'UNFI/USDT', 'ACM/USDT', 'GAS/USDT', 'SANTOS/USDT', 'MANA/USDT', 'QUICK/USDT', 'PORTO/USDT', 'CHR/USDT', 'JST/USDT', 'AKRO/USDT', 'BOND/USDT', 'DEGO/USDT', 'BAT/USDT', 'DODO/USDT', 'AGLD/USDT', 'JUV/USDT', 'LUNC/USDT', 'DIA/USDT', 'KEY/USDT', 'BSW/USDT', 'OM/USDT', 'TLM/USDT', 'ENS/USDT', 'ANT/USDT', 'IOTA/USDT', 'STG/USDT', 'TROY/USDT', 'ALICE/USDT', 'TVK/USDT']
         self.o_l = {}
 
         self.time_order = None
@@ -38,6 +38,108 @@ class BotBinance():
 
         self.const_up = 305000
         self.const_dn = 12.5
+
+
+    def top_tier(self):
+
+        ttl_code_array = []
+        ttl_prft_array = []
+        obj_lst = {}
+        bal_obj = {}
+        tk_list = self.get_filter_ticker(True)
+
+        for code in tk_list:
+
+            df = self.strategy_rsi(self.gen_bnc_df(code, '5m', 12*24*3))
+
+            obj_lst[code] = {
+                'bool_buy': False,
+                'buy_price': 0,
+                'buy_avg_price': 0,
+                'quantity_ratio': 0,
+                'bool_sell': False,
+                '70_position': ''
+            }
+            
+            if not df is None:
+                _ror = 1
+                bal_obj[code] = {'b': 0}
+
+                for i, row in df.iterrows():
+                    
+                    cls_val = row['close']
+                    rsi = row['rsi']
+                    rsi_prev = row['rsi_prev']
+                    volume_osc = row['volume_osc']
+                    cur_prc = float(cls_val)
+
+                    ol_bool_buy = copy.deepcopy(obj_lst[code]['bool_buy'])
+
+                    if \
+                    (rsi <= 30) and (rsi_prev > rsi) and (volume_osc > 0) \
+                    :
+                        ol_bool_buy = copy.deepcopy(obj_lst[code]['bool_buy'])
+
+                        if ol_bool_buy:
+                            prev_price = copy.deepcopy(obj_lst[code]['buy_avg_price'])
+                            ol_quantity_ratio = copy.deepcopy(obj_lst[code]['quantity_ratio'])
+                            obj_lst[code]['buy_price'] = cur_prc
+                            obj_lst[code]['buy_avg_price'] = ((prev_price* (ol_quantity_ratio - 1)) + cur_prc) / ol_quantity_ratio
+                            obj_lst[code]['quantity_ratio'] = ol_quantity_ratio + 1
+                        else:
+                            obj_lst[code] = {
+                                'bool_buy': True,
+                                'buy_price': cur_prc,
+                                'buy_avg_price': cur_prc,
+                                'quantity_ratio': 2,
+                                'bool_sell': False,
+                                '70_position': ''
+                            }
+
+                    if obj_lst[code]['bool_buy'] == True:
+
+                        obj_avg_prc = float(copy.deepcopy(obj_lst[code]['buy_avg_price']))
+                        ol_quantity_ratio = copy.deepcopy(obj_lst[code]['quantity_ratio'])
+                        ol_bool_sell = copy.deepcopy(obj_lst[code]['bool_sell'])
+                        ol_70_position = copy.deepcopy(obj_lst[code]['70_position'])
+
+                        if rsi <= 50 and ol_bool_sell:
+                            _ror = get_ror(obj_avg_prc, cur_prc, _ror)
+                            obj_lst[code] = {
+                                'bool_buy': False,
+                                'buy_price': 0,
+                                'buy_avg_price': 0,
+                                'quantity_ratio': 0,
+                                'bool_sell': False,
+                                '70_position': ''
+                            }
+
+                        elif rsi >= 70 and ((ol_70_position == '70_down') or (ol_70_position == '70_up' and (rsi_prev <= rsi))):
+                            _ror = get_ror(obj_avg_prc, cur_prc, _ror)
+                            obj_lst[code]['quantity_ratio'] = ol_quantity_ratio - 1
+                            obj_lst[code]['bool_sell'] = True
+
+                            if obj_lst[code]['quantity_ratio'] == 0:
+                                obj_lst[code] = {
+                                    'bool_buy': False,
+                                    'buy_price': 0,
+                                    'buy_avg_price': 0,
+                                    'quantity_ratio': 0,
+                                    'bool_sell': False,
+                                    '70_position': ''
+                                }
+
+                    obj_lst[code]['70_position'] = '70_down' if rsi < 70 else '70_up'
+
+                prft_per = round(((_ror - 1) * 100), 2)
+
+                ttl_code_array.append(code)
+                ttl_prft_array.append(prft_per)
+
+        prft_df = pd.DataFrame({'code': ttl_code_array, 'profit': ttl_prft_array})
+        prft_df = prft_df.sort_values('profit', ascending=False)
+        toptier_list = prft_df.head(80)['code'].to_list()
+        save_file(FILE_URL_TPTR_3M, toptier_list)
 
     
     def init_per_day(self):
@@ -55,6 +157,12 @@ class BotBinance():
                 time.sleep(300 - tn_d + 150)
 
             self.bool_balance = True
+
+        tn_tt = datetime.datetime.now()
+
+        if tn_tt.hour == 0 and tn_tt.minute == 2 and (30 <= tn_tt.second < 35):
+            self.top_tier()
+            self.t_l = load_file(FILE_URL_TPTR_3M)
 
         print('##############################')
 
@@ -251,36 +359,25 @@ class BotBinance():
 
 
     # Spot, USDT Filter Ticker
-    def get_filter_ticker(self):
+    def get_filter_ticker(self, init=False):
         mks = self.bnc.load_markets()
         tks = []
-        lst = []
 
         for mk in mks:
             if \
-            mk in self.t_l and \
             mk.endswith('/USDT') and \
             mks[mk]['active'] == True and \
             mks[mk]['info']['status'] == 'TRADING' and \
             mks[mk]['info']['isSpotTradingAllowed'] == True and \
             'SPOT' in mks[mk]['info']['permissions'] \
             :
-                tks.append(mk)
+                if not init:
+                    if mk in self.t_l:
+                        tks.append(mk)
+                else:
+                    tks.append(mk)
 
         return tks
-
-        # _tks = list(set(tks).difference(self.x_l))
-
-        # for tk in _tks:
-        #     df = self.gen_bnc_df(tk, '1w', 2)
-        #     _df = df.head(1)
-        #     volume = float(_df['volume'].iloc[-1])
-        #     lst.append({'t': tk, 'v': volume})
-
-        # lst = sorted(lst, key=lambda x: x['v'])
-        # lst = [t['t'] for t in lst]
-
-        # return lst
     
 
     # Strategy RSI
