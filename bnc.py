@@ -262,7 +262,9 @@ class BotBinance():
             :
                 tks.append(mk)
 
-        for tk in tks:
+        _tks = list(set(tks).difference(self.x_l))
+
+        for tk in _tks:
             df = self.gen_bnc_df(tk, '1w', 2)
             _df = df.head(1)
             volume = float(_df['volume'].iloc[-1])
