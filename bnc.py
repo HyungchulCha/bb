@@ -64,7 +64,7 @@ class BotBinance():
         self.b_l = list(set(self.q_l + bal_lst))
         self.r_l = list(set(bal_lst).difference(self.q_l))
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
-        self.prc_ttl = 15100
+        self.prc_ttl = 12000
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
         prc_buy = self.prc_ttl / (len(self.q_l) * 6)
         self.prc_buy = prc_buy if prc_buy > self.const_dn else self.const_dn
@@ -85,8 +85,9 @@ class BotBinance():
         int_prc_ttl = int(self.prc_ttl)
         int_prc_lmt = int(self.prc_lmt)
         len_bal_lst = len(self.b_l)
+        len_rmn_lst = len(self.r_l)
 
-        line_message(f'BotBinance \nTotal Price : {int_prc_ttl:,} USDT \nLimit Price : {int_prc_lmt:,} USDT \nSymbol List : {len_bal_lst}')
+        line_message(f'BotBinance \nTotal Price : {int_prc_ttl:,} USDT \nLimit Price : {int_prc_lmt:,} USDT \nSymbol List : {len_bal_lst} \nOther List : {len_rmn_lst}')
 
         __tn = datetime.datetime.now()
         __tn_min = __tn.minute % 5
@@ -264,7 +265,7 @@ class BotBinance():
             volume = float(df['volume'].iloc[-1])
             lst.append({'t': tk, 'v': volume})
 
-        lst = sorted(lst, key=lambda x: x['v'])[-100:]
+        lst = sorted(lst, key=lambda x: x['v'])[-80:]
         lst = [t['t'] for t in lst]
 
         return lst
