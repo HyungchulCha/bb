@@ -77,7 +77,11 @@ class BotBinance():
             save_file(FILE_URL_TIKR_3M, self.o_l)
 
         for tk in self.b_l:
-            if (not (tk in self.o_l)) or ((tk in self.o_l) and (self.o_l[tk]['bool_buy'] == True) and (not (tk in bal_lst))):
+            if not (tk in self.o_l):
+                self.get_tiker_data_init(tk)
+
+        for _tk in self.o_l:
+            if (self.o_l[_tk]['bool_buy'] == True) and (not (_tk in self.b_l)):
                 self.get_tiker_data_init(tk)
 
         if self.prc_lmt < self.prc_buy:
@@ -88,7 +92,7 @@ class BotBinance():
         len_bal_lst = len(self.b_l)
         len_rmn_lst = len(self.r_l)
 
-        line_message(f'BotBinance \nTotal Price : {int_prc_ttl:,} USDT \nLimit Price : {int_prc_lmt:,} USDT \nSymbol List : {len_bal_lst} \nOther List : {len_rmn_lst} \n{self.r_l}')
+        line_message(f'BotBinance \nTotal Price : {int_prc_ttl:,} USDT \nLimit Price : {int_prc_lmt:,} USDT \nSymbol List : {len_bal_lst} \nOther List : {len_rmn_lst}')
 
         __tn = datetime.datetime.now()
         __tn_min = __tn.minute % 5
