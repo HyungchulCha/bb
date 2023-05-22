@@ -189,10 +189,8 @@ class BotBinance():
         for tk in self.b_l:
             if not (tk in self.o_l):
                 self.get_tiker_data_init(tk)
-
-        print(self.b_l)
+                
         for _tk in self.o_l:
-            print(_tk)
             if (self.o_l[_tk]['bool_buy'] == True) and (not (_tk in self.b_l)):
                 self.get_tiker_data_init(_tk)
 
