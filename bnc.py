@@ -22,7 +22,7 @@ class BotBinance():
         self.q_l = []
         self.b_l = []
         self.r_l = []
-        self.t_l = ['HIGH/USDT', 'LQTY/USDT', 'FXS/USDT', 'ACH/USDT', 'ASR/USDT', 'TOMO/USDT', 'CTSI/USDT', 'PYR/USDT', 'SYN/USDT', 'BEL/USDT', 'IOTX/USDT', 'ONT/USDT', 'KMD/USDT', 'ARPA/USDT', 'SNX/USDT', 'UTK/USDT', 'RLC/USDT', 'CHESS/USDT', 'LDO/USDT', 'PEOPLE/USDT', 'BTS/USDT', 'AUDIO/USDT', 'CRV/USDT', 'COCOS/USDT', 'RNDR/USDT', 'TKO/USDT', 'RSR/USDT', 'RPL/USDT', 'FLUX/USDT', 'REN/USDT', 'RIF/USDT', 'DREP/USDT', 'NKN/USDT', 'OCEAN/USDT', 'SUSHI/USDT', 'WTC/USDT', 'KAVA/USDT', 'PSG/USDT', 'RAD/USDT', 'CVP/USDT', 'SSV/USDT', 'WRX/USDT', 'GALA/USDT', 'ATM/USDT', 'MASK/USDT', 'POND/USDT', 'CFX/USDT', 'BAL/USDT', 'FLM/USDT', 'DUSK/USDT', 'ELF/USDT', 'UNFI/USDT', 'ACM/USDT', 'GAS/USDT', 'SANTOS/USDT', 'MANA/USDT', 'QUICK/USDT', 'PORTO/USDT', 'CHR/USDT', 'JST/USDT', 'AKRO/USDT', 'BOND/USDT', 'DEGO/USDT', 'BAT/USDT', 'DODO/USDT', 'AGLD/USDT', 'JUV/USDT', 'LUNC/USDT', 'DIA/USDT', 'KEY/USDT', 'BSW/USDT', 'OM/USDT', 'TLM/USDT', 'ENS/USDT', 'ANT/USDT', 'IOTA/USDT', 'STG/USDT', 'TROY/USDT', 'ALICE/USDT', 'TVK/USDT']
+        self.t_l = []
         self.o_l = {}
 
         self.time_order = None
@@ -169,6 +169,7 @@ class BotBinance():
 
         self.bnc = ccxt.binance(config={'apiKey': self.access_key, 'secret': self.secret_key, 'enableRateLimit': True})
         
+        self.t_l = load_file(FILE_URL_TPTR_3M)
         self.q_l = self.get_filter_ticker()
         prc_ttl, prc_lmt, _, bal_lst  = self.get_balance_info()
         self.b_l = list(set(self.q_l + bal_lst))
@@ -189,9 +190,11 @@ class BotBinance():
             if not (tk in self.o_l):
                 self.get_tiker_data_init(tk)
 
+        print(self.b_l)
         for _tk in self.o_l:
+            print(_tk)
             if (self.o_l[_tk]['bool_buy'] == True) and (not (_tk in self.b_l)):
-                self.get_tiker_data_init(tk)
+                self.get_tiker_data_init(_tk)
 
         if self.prc_lmt < self.prc_buy:
             line_message('BotBinance Insufficient Balance !!!')
