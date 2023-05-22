@@ -163,7 +163,7 @@ class BotBinance():
         if tn_tt.hour == 0 and tn_tt.minute == 2 and (30 <= tn_tt.second < 35):
             self.top_tier()
             self.t_l = load_file(FILE_URL_TPTR_3M)
-            line_message(f'BotBinance \nTop Tier List : {self.t_l}')
+            line_message(f'BotBinance \nToday Top Tier List \n{self.t_l}')
 
         print('##############################')
 
@@ -190,7 +190,6 @@ class BotBinance():
                 self.get_tiker_data_init(tk)
 
         for _tk in self.o_l:
-            print(_tk, ((self.o_l[_tk]['bool_buy'] == True) and (not (_tk in self.b_l))))
             if (self.o_l[_tk]['bool_buy'] == True) and (not (_tk in self.b_l)):
                 self.get_tiker_data_init(tk)
 
