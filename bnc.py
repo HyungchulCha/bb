@@ -237,16 +237,16 @@ class BotBinance():
                 str_vol_osc = round(vol_osc, 2)
                 print(f'{symbol} : RSI - {str_rsi}, RSI_P - {str_rsi_prv}, VO - {str_vol_osc}')
                 
-                bal_sym = symbol in bal_lst
-                psb_sel = (bal_sym and (cur_prc * bal_lst[symbol]['b'] > self.const_dn))
                 bb = copy.deepcopy(self.o_l[symbol]['bool_buy'])
-                nt = bb and ((not bal_sym) or (bal_sym and (cur_prc * bal_lst[symbol]['b'] < self.const_dn)))
+                tb = copy.deepcopy(bal_lst[symbol]['b'])
+                bal_sym = symbol in bal_lst
+                psb_sel = (bal_sym and (cur_prc * tb > self.const_dn))
+                nt = bb and ((not bal_sym) or (bal_sym and (cur_prc * tb < self.const_dn)))
 
                 if nt:
                     self.get_tiker_data_init(symbol)
 
                 if psb_sel and bb:
-                    tb = copy.deepcopy(bal_lst[symbol]['b'])
                     bp = copy.deepcopy(self.o_l[symbol]['buy_price'])
                     qr = copy.deepcopy(self.o_l[symbol]['quantity_ratio'])
                     bs = copy.deepcopy(self.o_l[symbol]['bool_sell'])
