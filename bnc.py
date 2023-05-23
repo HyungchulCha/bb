@@ -155,7 +155,7 @@ class BotBinance():
         if tn_tt.hour == 8 and tn_tt.minute == 57 and (30 <= tn_tt.second < 35):
             self.top_tier()
             self.t_l = load_file(FILE_URL_TPTR_3M)
-            line_message(f'BotBinance \nToday Top Tier List \n{self.t_l}')
+            line_message(f'BotBinance \nToday Top-Tier \n{self.t_l}')
 
         print('##############################')
 
@@ -193,7 +193,7 @@ class BotBinance():
         int_prc_lmt = int(self.prc_lmt)
         len_bal_lst = len(self.b_l)
 
-        line_message(f'BotBinance \nTotal Price : {int_prc_ttl:,} USDT \nLimit Price : {int_prc_lmt:,} USDT \nSymbol List : {len_bal_lst}')
+        line_message(f'BotBinance \nT : {int_prc_ttl:,} USDT \nL : {int_prc_lmt:,} USDT \nS : {len_bal_lst}')
 
         __tn = datetime.datetime.now()
         __tn_min = __tn.minute % 5
@@ -335,11 +335,10 @@ class BotBinance():
         self.time_backtest = threading.Timer(300 - (60 * __tn_min) - __tn_sec, self.stock_order)
         self.time_backtest.start()
 
-        int_prc_ttl = int(self.prc_ttl)
         str_start = _tn.strftime('%Y/%m/%d %H:%M:%S')
         str_end = __tn.strftime('%Y/%m/%d %H:%M:%S')
 
-        line_message(f'BotBinance \nStart : {str_start}, \nEnd : {str_end}, \nTotal Price : {int_prc_ttl:,} USDT {sel_txt}')
+        line_message(f'BotBinance \nS : {str_start}, \nE : {str_end} {sel_txt}')
     
 
     # Tiker Data Init
