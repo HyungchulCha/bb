@@ -14,7 +14,7 @@ class BotBinance():
 
     def __init__(self):
 
-        self.is_aws = True
+        self.is_aws = False
         self.access_key = BN_ACCESS_KEY_AWS if self.is_aws else BN_ACCESS_KEY_NAJU
         self.secret_key = BN_SECRET_KEY_AWS if self.is_aws else BN_SECRET_KEY_NAJU
         self.bnc = ccxt.binance(config={'apiKey': self.access_key, 'secret': self.secret_key, 'enableRateLimit': True})
@@ -42,13 +42,13 @@ class BotBinance():
 
     def top_tier(self):
 
-        ttl_code_array = []
-        ttl_prft_array = []
+        sym_arr = []
+        pft_arr = []
         obj_lst = {}
         bal_obj = {}
-        tk_list = self.get_filter_ticker(True)
+        tks = self.get_filter_ticker(True)
 
-        for code in tk_list:
+        for code in tks:
 
             df = self.strategy_rsi(self.gen_bnc_df(code, '5m', 12*24*3))
 
@@ -67,25 +67,22 @@ class BotBinance():
 
                 for i, row in df.iterrows():
                     
-                    cls_val = row['close']
                     rsi = row['rsi']
-                    rsi_prev = row['rsi_prev']
-                    volume_osc = row['volume_osc']
-                    cur_prc = float(cls_val)
+                    rsi_prv = row['rsi_prev']
+                    vol_osc = row['volume_osc']
+                    cur_prc = float(row['close'])
 
-                    ol_bool_buy = copy.deepcopy(obj_lst[code]['bool_buy'])
+                    bb = copy.deepcopy(obj_lst[code]['bool_buy'])
 
-                    if \
-                    (rsi <= 30) and (rsi_prev > rsi) and (volume_osc > 0) \
-                    :
-                        ol_bool_buy = copy.deepcopy(obj_lst[code]['bool_buy'])
+                    if (rsi <= 30) and (rsi_prv > rsi) and (vol_osc > 0):
+                        bb = copy.deepcopy(obj_lst[code]['bool_buy'])
 
-                        if ol_bool_buy:
-                            prev_price = copy.deepcopy(obj_lst[code]['buy_avg_price'])
-                            ol_quantity_ratio = copy.deepcopy(obj_lst[code]['quantity_ratio'])
+                        if bb:
+                            bp = copy.deepcopy(obj_lst[code]['buy_avg_price'])
+                            qr = copy.deepcopy(obj_lst[code]['quantity_ratio'])
                             obj_lst[code]['buy_price'] = cur_prc
-                            obj_lst[code]['buy_avg_price'] = ((prev_price* (ol_quantity_ratio - 1)) + cur_prc) / ol_quantity_ratio
-                            obj_lst[code]['quantity_ratio'] = ol_quantity_ratio + 1
+                            obj_lst[code]['buy_avg_price'] = ((bp * (qr - 1)) + cur_prc) / qr
+                            obj_lst[code]['quantity_ratio'] = qr + 1
                         else:
                             obj_lst[code] = {
                                 'bool_buy': True,
@@ -98,13 +95,13 @@ class BotBinance():
 
                     if obj_lst[code]['bool_buy'] == True:
 
-                        obj_avg_prc = float(copy.deepcopy(obj_lst[code]['buy_avg_price']))
-                        ol_quantity_ratio = copy.deepcopy(obj_lst[code]['quantity_ratio'])
-                        ol_bool_sell = copy.deepcopy(obj_lst[code]['bool_sell'])
-                        ol_70_position = copy.deepcopy(obj_lst[code]['70_position'])
+                        bp = float(copy.deepcopy(obj_lst[code]['buy_avg_price']))
+                        qr = copy.deepcopy(obj_lst[code]['quantity_ratio'])
+                        bs = copy.deepcopy(obj_lst[code]['bool_sell'])
+                        p7 = copy.deepcopy(obj_lst[code]['70_position'])
 
-                        if rsi <= 50 and ol_bool_sell:
-                            _ror = get_ror(obj_avg_prc, cur_prc, _ror)
+                        if rsi <= 50 and bs:
+                            _ror = get_ror(bp, cur_prc, _ror)
                             obj_lst[code] = {
                                 'bool_buy': False,
                                 'buy_price': 0,
@@ -114,9 +111,9 @@ class BotBinance():
                                 '70_position': ''
                             }
 
-                        elif rsi >= 70 and ((ol_70_position == '70_down') or (ol_70_position == '70_up' and (rsi_prev <= rsi))):
-                            _ror = get_ror(obj_avg_prc, cur_prc, _ror)
-                            obj_lst[code]['quantity_ratio'] = ol_quantity_ratio - 1
+                        elif rsi >= 70 and ((p7 == '70_down') or (p7 == '70_up' and (rsi_prv <= rsi))):
+                            _ror = get_ror(bp, cur_prc, _ror)
+                            obj_lst[code]['quantity_ratio'] = qr - 1
                             obj_lst[code]['bool_sell'] = True
 
                             if obj_lst[code]['quantity_ratio'] == 0:
@@ -131,15 +128,15 @@ class BotBinance():
 
                     obj_lst[code]['70_position'] = '70_down' if rsi < 70 else '70_up'
 
-                prft_per = round(((_ror - 1) * 100), 2)
+                pft_per = round(((_ror - 1) * 100), 2)
 
-                ttl_code_array.append(code)
-                ttl_prft_array.append(prft_per)
+                sym_arr.append(code)
+                pft_arr.append(pft_per)
 
-        prft_df = pd.DataFrame({'code': ttl_code_array, 'profit': ttl_prft_array})
-        prft_df = prft_df.sort_values('profit', ascending=False)
-        toptier_list = prft_df.head(100)['code'].to_list()
-        save_file(FILE_URL_TPTR_3M, toptier_list)
+        pft_df = pd.DataFrame({'code': sym_arr, 'profit': pft_arr})
+        pft_df = pft_df.sort_values('profit', ascending=False)
+        ttr_li = pft_df.head(100)['code'].to_list()
+        save_file(FILE_URL_TPTR_3M, ttr_li)
 
     
     def init_per_day(self):
@@ -151,10 +148,10 @@ class BotBinance():
             tn_d = int(((tn - tn_0).seconds) % 300)
             print(f'{tn_d} Second')
 
-            # if tn_d <= 150:
-            #     time.sleep(300 - tn_d - 150)
-            # else:
-            #     time.sleep(300 - tn_d + 150)
+            if tn_d <= 150:
+                time.sleep(300 - tn_d - 150)
+            else:
+                time.sleep(300 - tn_d + 150)
 
             self.bool_balance = True
 
@@ -219,7 +216,7 @@ class BotBinance():
             tn = datetime.datetime.now()
             tn_0 = tn.replace(hour=0, minute=0, second=0)
             tn_d = int(((tn - tn_0).seconds) % 300)
-            # time.sleep(300 - tn_d)
+            time.sleep(300 - tn_d)
             self.bool_order = True
 
         _tn = datetime.datetime.now()
@@ -232,98 +229,96 @@ class BotBinance():
         for symbol in self.b_l:
 
             df = self.strategy_rsi(self.gen_bnc_df(symbol, '5m', 120))
-            is_df = not (df is None)
 
-            if is_df:
+            if not (df is None):
                 
-                df_h = df.tail(2).head(1)
-                close = df_h['close'].iloc[-1]
-                rsi = df_h['rsi'].iloc[-1]
-                rsi_prev = df_h['rsi_prev'].iloc[-1]
-                volume_osc = df_h['volume_osc'].iloc[-1]
+                dfh = df.tail(2).head(1)
+                rsi = dfh['rsi'].iloc[-1]
+                rsi_prv = dfh['rsi_prev'].iloc[-1]
+                vol_osc = dfh['volume_osc'].iloc[-1]
+                cur_prc = float(dfh['close'].iloc[-1])
 
                 str_rsi = round(rsi, 2)
-                str_rsi_prev = round(rsi_prev, 2)
-                str_volume_osc = round(volume_osc, 2)
-                print(f'{symbol} : RSI - {str_rsi}, RSI_P - {str_rsi_prev}, VO - {str_volume_osc}')
+                str_rsi_prv = round(rsi_prv, 2)
+                str_vol_osc = round(vol_osc, 2)
+                print(f'{symbol} : RSI - {str_rsi}, RSI_P - {str_rsi_prv}, VO - {str_vol_osc}')
+                
+                bal_sym = symbol in bal_lst
+                psb_sel = (bal_sym and (cur_prc * bal_lst[symbol]['b'] > self.const_dn))
+                bb = copy.deepcopy(self.o_l[symbol]['bool_buy'])
+                nt = bb and ((not bal_sym) or (bal_sym and (cur_prc * bal_lst[symbol]['b'] < self.const_dn)))
 
-                cur_prc = float(close)
-            
-                is_symbol_bal = symbol in bal_lst
-                is_psb_sel = (is_symbol_bal and (cur_prc * bal_lst[symbol]['b'] > self.const_dn))
-                ol_bool_buy = copy.deepcopy(self.o_l[symbol]['bool_buy'])
-                is_nothing = ol_bool_buy and ((not is_symbol_bal) or (is_symbol_bal and (cur_prc * bal_lst[symbol]['b'] < self.const_dn)))
-
-                print(is_nothing)
-                if is_nothing:
+                if nt:
                     self.get_tiker_data_init(symbol)
 
-                if is_psb_sel and ol_bool_buy:
+                if psb_sel and bb:
+                    tb = copy.deepcopy(bal_lst[symbol]['b'])
+                    bp = copy.deepcopy(self.o_l[symbol]['buy_price'])
+                    qr = copy.deepcopy(self.o_l[symbol]['quantity_ratio'])
+                    bs = copy.deepcopy(self.o_l[symbol]['bool_sell'])
+                    p7 = copy.deepcopy(self.o_l[symbol]['70_position'])
+                    sq = (tb * (1 / qr))
+                    psb_sel_div = (cur_prc * sq) > self.const_dn
 
-                    bl_balance = copy.deepcopy(bal_lst[symbol]['b'])
-                    ol_buy_price = copy.deepcopy(self.o_l[symbol]['buy_price'])
-                    ol_quantity_ratio = copy.deepcopy(self.o_l[symbol]['quantity_ratio'])
-                    ol_bool_sell = copy.deepcopy(self.o_l[symbol]['bool_sell'])
-                    ol_70_position = copy.deepcopy(self.o_l[symbol]['70_position'])
-                    sell_qty = bl_balance * (1 / ol_quantity_ratio)
-                    sell_qty = round(sell_qty, 8)
-                    is_psb_sel_div = (cur_prc * sell_qty) > self.const_dn
+                    if (not psb_sel_div) and qr > 1:
+                        sq = tb * (1 / (qr - 1))
 
-                    if (not is_psb_sel_div) and ol_quantity_ratio > 1:
-                        sell_qty = bl_balance * (1 / ol_quantity_ratio - 1)
-                        sell_qty = round(sell_qty, 8)
+                    tb = round(tb, 8)
+                    sq = round(sq, 8)
 
-                    if rsi <= 50 and ol_bool_sell:
-                        self.bnc.create_market_sell_order(symbol=symbol, amount=bl_balance)
-                        self.get_tiker_data_init(symbol)
-
-                        _ror = get_ror(ol_buy_price, cur_prc)
-                        print(f'Sell - Symbol: {symbol}, Profit: {round(_ror, 4)}')
-                        sel_lst.append({'c': '[S&] ' + symbol, 'r': round(_ror, 4)})
-
-                    elif rsi >= 70 and ((ol_70_position == '70_down') or (ol_70_position == '70_up' and (rsi_prev <= rsi))):
-                        self.bnc.create_market_sell_order(symbol=symbol, amount=sell_qty)
-                        self.o_l[symbol]['quantity_ratio'] = ol_quantity_ratio - 1
-                        self.o_l[symbol]['bool_sell'] = True
-
-                        if (not is_psb_sel_div) and ol_quantity_ratio > 1:
-                            self.o_l[symbol]['quantity_ratio'] = ol_quantity_ratio - 2
-
-                        if self.o_l[symbol]['quantity_ratio'] == 0:
+                    if rsi <= 50 and bs:
+                        res = self.bnc.create_market_sell_order(symbol=symbol, amount=tb)
+                        if res['info']['status'] == 'FILLED':
                             self.get_tiker_data_init(symbol)
+                            _ror = get_ror(bp, cur_prc)
+                            print(f'Sell - Symbol: {symbol}, Profit: {round(_ror, 4)}')
+                            sel_lst.append({'c': '[S&] ' + symbol, 'r': round(_ror, 4)})
 
-                        _ror = get_ror(ol_buy_price, cur_prc)
-                        print(f'Sell - Symbol: {symbol}, Profit: {round(_ror, 4)}')
-                        sel_lst.append({'c': '[S+] ' + symbol, 'r': round(_ror, 4)})
+                    elif rsi >= 70 and ((p7 == '70_down') or (p7 == '70_up' and (rsi_prv <= rsi))):
+                        res = self.bnc.create_market_sell_order(symbol=symbol, amount=sq)
+                        if res['info']['status'] == 'FILLED':
+                            self.o_l[symbol]['quantity_ratio'] = qr - 1
+                            self.o_l[symbol]['bool_sell'] = True
+
+                            if (not psb_sel_div) and qr > 1:
+                                self.o_l[symbol]['quantity_ratio'] = qr - 2
+
+                            if self.o_l[symbol]['quantity_ratio'] == 0:
+                                self.get_tiker_data_init(symbol)
+
+                            _ror = get_ror(bp, cur_prc)
+                            print(f'Sell - Symbol: {symbol}, Profit: {round(_ror, 4)}')
+                            sel_lst.append({'c': '[S+] ' + symbol, 'r': round(_ror, 4)})
                         
 
-                if (rsi <= 30) and (rsi_prev > rsi) and (volume_osc > 0):
+                if (rsi <= 30) and (rsi_prv > rsi) and (vol_osc > 0):
                     
-                    is_psb_ord = float(self.bnc.fetch_balance()['USDT']['free']) > self.prc_buy
-                    is_remain_symbol = symbol in self.r_l
-                    buy_qty = float(self.prc_buy / cur_prc)
-                    buy_qty = round(buy_qty, 8)
+                    psb_ord = float(self.bnc.fetch_balance()['USDT']['free']) > self.prc_buy
+                    rmn_sym = symbol in self.r_l
+                    bq = float(self.prc_buy / cur_prc)
+                    bq = round(bq, 8)
 
-                    if is_psb_ord and (not is_remain_symbol):
-                        self.bnc.create_market_buy_order(symbol=symbol, amount=buy_qty)
-                        ol_bool_buy = copy.deepcopy(self.o_l[symbol]['bool_buy'])
-                        ol_buy_price = copy.deepcopy(self.o_l[symbol]['buy_price'])
-                        ol_quantity_ratio = copy.deepcopy(self.o_l[symbol]['quantity_ratio'])
+                    if psb_ord and (not rmn_sym):
+                        res = self.bnc.create_market_buy_order(symbol=symbol, amount=bq)
+                        if res['info']['status'] == 'FILLED':
+                            bb = copy.deepcopy(self.o_l[symbol]['bool_buy'])
+                            bp = copy.deepcopy(self.o_l[symbol]['buy_price'])
+                            qr = copy.deepcopy(self.o_l[symbol]['quantity_ratio'])
 
-                        if ol_bool_buy:
-                            self.o_l[symbol]['buy_price'] = ((ol_buy_price * (ol_quantity_ratio - 1)) + cur_prc) / ol_quantity_ratio
-                            self.o_l[symbol]['quantity_ratio'] = ol_quantity_ratio + 1
-                        else:
-                            self.o_l[symbol] = {
-                                'bool_buy': True,
-                                'buy_price': cur_prc,
-                                'quantity_ratio': 2,
-                                'bool_sell': False,
-                                '70_position': ''
-                            }
+                            if bb:
+                                self.o_l[symbol]['buy_price'] = ((bp * (qr - 1)) + cur_prc) / qr
+                                self.o_l[symbol]['quantity_ratio'] = qr + 1
+                            else:
+                                self.o_l[symbol] = {
+                                    'bool_buy': True,
+                                    'buy_price': cur_prc,
+                                    'quantity_ratio': 2,
+                                    'bool_sell': False,
+                                    '70_position': ''
+                                }
 
-                        print(f'Buy - Symbol: {symbol}, Balance: {buy_qty}')
-                        sel_lst.append({'c': '[B] ' + symbol, 'r': (buy_qty)})
+                            print(f'Buy - Symbol: {symbol}, Balance: {bq}')
+                            sel_lst.append({'c': '[B] ' + symbol, 'r': (bq)})
 
 
                 self.o_l[symbol]['70_position'] = '70_down' if rsi < 70 else '70_up'
@@ -458,23 +453,23 @@ class BotBinance():
 if __name__ == '__main__':
 
     bb = BotBinance()
-    bb.init_per_day()
-    bb.stock_order()
+    # bb.init_per_day()
+    # bb.stock_order()
     # bb.all_sell_order()
 
-    # while True:
+    while True:
 
-    #     try:
+        try:
 
-    #         tn = datetime.datetime.now()
-    #         tn_start = tn.replace(hour=0, minute=0, second=0)
+            tn = datetime.datetime.now()
+            tn_start = tn.replace(hour=0, minute=0, second=0)
 
-    #         if tn >= tn_start and bb.bool_start == False:
-    #             bb.init_per_day()
-    #             bb.stock_order()
-    #             bb.bool_start = True
+            if tn >= tn_start and bb.bool_start == False:
+                bb.init_per_day()
+                bb.stock_order()
+                bb.bool_start = True
 
-    #     except Exception as e:
+        except Exception as e:
 
-    #         line_message(f"BotBinance Error : {e}")
-    #         break
+            line_message(f"BotBinance Error : {e}")
+            break
