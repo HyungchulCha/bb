@@ -237,9 +237,10 @@ class BotBinance():
                 str_vol_osc = round(vol_osc, 2)
                 print(f'{symbol} : RSI - {str_rsi}, RSI_P - {str_rsi_prv}, VO - {str_vol_osc}')
                 
-                bb = copy.deepcopy(self.o_l[symbol]['bool_buy'])
+                
                 bal_sym = symbol in bal_lst
                 psb_sel = (bal_sym and (cur_prc * bal_lst[symbol]['b'] > self.const_dn))
+                bb = copy.deepcopy(self.o_l[symbol]['bool_buy'])
                 nt = bb and ((not bal_sym) or (bal_sym and (cur_prc * bal_lst[symbol]['b'] < self.const_dn)))
 
                 if nt:
