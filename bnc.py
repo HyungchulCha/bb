@@ -151,16 +151,16 @@ class BotBinance():
             tn_d = int(((tn - tn_0).seconds) % 300)
             print(f'{tn_d} Second')
 
-            if tn_d <= 150:
-                time.sleep(300 - tn_d - 150)
-            else:
-                time.sleep(300 - tn_d + 150)
+            # if tn_d <= 150:
+            #     time.sleep(300 - tn_d - 150)
+            # else:
+            #     time.sleep(300 - tn_d + 150)
 
             self.bool_balance = True
 
         tn_tt = datetime.datetime.now()
 
-        if tn_tt.hour == 0 and tn_tt.minute == 2 and (30 <= tn_tt.second < 35):
+        if tn_tt.hour == 9 and tn_tt.minute == 2 and (30 <= tn_tt.second < 35):
             self.top_tier()
             self.t_l = load_file(FILE_URL_TPTR_3M)
             line_message(f'BotBinance \nToday Top Tier List \n{self.t_l}')
@@ -219,7 +219,7 @@ class BotBinance():
             tn = datetime.datetime.now()
             tn_0 = tn.replace(hour=0, minute=0, second=0)
             tn_d = int(((tn - tn_0).seconds) % 300)
-            time.sleep(300 - tn_d)
+            # time.sleep(300 - tn_d)
             self.bool_order = True
 
         _tn = datetime.datetime.now()
@@ -254,6 +254,7 @@ class BotBinance():
                 ol_bool_buy = copy.deepcopy(self.o_l[symbol]['bool_buy'])
                 is_nothing = ol_bool_buy and ((not is_symbol_bal) or (is_symbol_bal and (cur_prc * bal_lst[symbol]['b'] < self.const_dn)))
 
+                print(is_nothing)
                 if is_nothing:
                     self.get_tiker_data_init(symbol)
 
@@ -265,10 +266,12 @@ class BotBinance():
                     ol_bool_sell = copy.deepcopy(self.o_l[symbol]['bool_sell'])
                     ol_70_position = copy.deepcopy(self.o_l[symbol]['70_position'])
                     sell_qty = bl_balance * (1 / ol_quantity_ratio)
+                    sell_qty = round(sell_qty, 8)
                     is_psb_sel_div = (cur_prc * sell_qty) > self.const_dn
 
                     if (not is_psb_sel_div) and ol_quantity_ratio > 1:
                         sell_qty = bl_balance * (1 / ol_quantity_ratio - 1)
+                        sell_qty = round(sell_qty, 8)
 
                     if rsi <= 50 and ol_bool_sell:
                         self.bnc.create_market_sell_order(symbol=symbol, amount=bl_balance)
@@ -299,9 +302,9 @@ class BotBinance():
                     is_psb_ord = float(self.bnc.fetch_balance()['USDT']['free']) > self.prc_buy
                     is_remain_symbol = symbol in self.r_l
                     buy_qty = float(self.prc_buy / cur_prc)
+                    buy_qty = round(buy_qty, 8)
 
                     if is_psb_ord and (not is_remain_symbol):
-
                         self.bnc.create_market_buy_order(symbol=symbol, amount=buy_qty)
                         ol_bool_buy = copy.deepcopy(self.o_l[symbol]['bool_buy'])
                         ol_buy_price = copy.deepcopy(self.o_l[symbol]['buy_price'])
@@ -455,23 +458,23 @@ class BotBinance():
 if __name__ == '__main__':
 
     bb = BotBinance()
-    # bb.init_per_day()
-    # bb.stock_order()
+    bb.init_per_day()
+    bb.stock_order()
     # bb.all_sell_order()
 
-    while True:
+    # while True:
 
-        try:
+    #     try:
 
-            tn = datetime.datetime.now()
-            tn_start = tn.replace(hour=0, minute=0, second=0)
+    #         tn = datetime.datetime.now()
+    #         tn_start = tn.replace(hour=0, minute=0, second=0)
 
-            if tn >= tn_start and bb.bool_start == False:
-                bb.init_per_day()
-                bb.stock_order()
-                bb.bool_start = True
+    #         if tn >= tn_start and bb.bool_start == False:
+    #             bb.init_per_day()
+    #             bb.stock_order()
+    #             bb.bool_start = True
 
-        except Exception as e:
+    #     except Exception as e:
 
-            line_message(f"BotBinance Error : {e}")
-            break
+    #         line_message(f"BotBinance Error : {e}")
+    #         break
