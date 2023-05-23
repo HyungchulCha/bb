@@ -267,7 +267,7 @@ class BotBinance():
                             self.get_tiker_data_init(symbol)
                             _ror = get_ror(bp, cur_prc)
                             print(f'Sell - Symbol: {symbol}, Profit: {round(_ror, 4)}')
-                            sel_lst.append({'c': '[S&] ' + symbol, 'r': round(_ror, 4)})
+                            sel_lst.append({'c': '[E] ' + symbol, 'r': round(_ror, 4)})
 
                     elif rsi >= 70 and ((p7 == '70_down') or (p7 == '70_up' and (rsi_prv <= rsi))):
                         res = self.bnc.create_market_sell_order(symbol=symbol, amount=sq)
@@ -283,7 +283,7 @@ class BotBinance():
 
                             _ror = get_ror(bp, cur_prc)
                             print(f'Sell - Symbol: {symbol}, Profit: {round(_ror, 4)}')
-                            sel_lst.append({'c': '[S+] ' + symbol, 'r': round(_ror, 4)})
+                            sel_lst.append({'c': '[S] ' + symbol, 'r': round(_ror, 4)})
                         
 
                 if (rsi <= 30) and (rsi_prv > rsi) and (vol_osc > 0):
@@ -338,7 +338,7 @@ class BotBinance():
         str_start = _tn.strftime('%Y/%m/%d %H:%M:%S')
         str_end = __tn.strftime('%Y/%m/%d %H:%M:%S')
 
-        line_message(f'BotBinance \nS : {str_start}, \nE : {str_end} {sel_txt}')
+        line_message(f'BotBinance \nS : {str_start} \nE : {str_end} {sel_txt}')
     
 
     # Tiker Data Init
