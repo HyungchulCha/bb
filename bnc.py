@@ -143,10 +143,10 @@ class BotBinance():
             tn_d = int(((tn - tn_0).seconds) % 300)
             print(f'{tn_d} Second')
 
-            # if tn_d <= 150:
-            #     time.sleep(300 - tn_d - 150)
-            # else:
-            #     time.sleep(300 - tn_d + 150)
+            if tn_d <= 150:
+                time.sleep(300 - tn_d - 150)
+            else:
+                time.sleep(300 - tn_d + 150)
 
             self.bool_balance = True
 
@@ -210,7 +210,7 @@ class BotBinance():
             tn = datetime.datetime.now()
             tn_0 = tn.replace(hour=0, minute=0, second=0)
             tn_d = int(((tn - tn_0).seconds) % 300)
-            # time.sleep(300 - tn_d)
+            time.sleep(300 - tn_d)
             self.bool_order = True
 
         _tn = datetime.datetime.now()
@@ -447,23 +447,23 @@ class BotBinance():
 if __name__ == '__main__':
 
     bb = BotBinance()
-    bb.init_per_day()
-    bb.stock_order()
+    # bb.init_per_day()
+    # bb.stock_order()
     # bb.all_sell_order()
 
-    # while True:
+    while True:
 
-    #     try:
+        try:
 
-    #         tn = datetime.datetime.now()
-    #         tn_start = tn.replace(hour=0, minute=0, second=0)
+            tn = datetime.datetime.now()
+            tn_start = tn.replace(hour=0, minute=0, second=0)
 
-    #         if tn >= tn_start and bb.bool_start == False:
-    #             bb.init_per_day()
-    #             bb.stock_order()
-    #             bb.bool_start = True
+            if tn >= tn_start and bb.bool_start == False:
+                bb.init_per_day()
+                bb.stock_order()
+                bb.bool_start = True
 
-    #     except Exception as e:
+        except Exception as e:
 
-    #         line_message(f"BotBinance Error : {e}")
-    #         break
+            line_message(f"BotBinance Error : {e}")
+            break
