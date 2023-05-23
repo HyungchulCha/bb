@@ -55,7 +55,6 @@ class BotBinance():
             obj_lst[code] = {
                 'bool_buy': False,
                 'buy_price': 0,
-                'buy_avg_price': 0,
                 'quantity_ratio': 0,
                 'bool_sell': False,
                 '70_position': ''
@@ -72,22 +71,19 @@ class BotBinance():
                     vol_osc = row['volume_osc']
                     cur_prc = float(row['close'])
 
-                    bb = copy.deepcopy(obj_lst[code]['bool_buy'])
-
                     if (rsi <= 30) and (rsi_prv > rsi) and (vol_osc > 0):
+
                         bb = copy.deepcopy(obj_lst[code]['bool_buy'])
 
                         if bb:
-                            bp = copy.deepcopy(obj_lst[code]['buy_avg_price'])
+                            bp = copy.deepcopy(obj_lst[code]['buy_price'])
                             qr = copy.deepcopy(obj_lst[code]['quantity_ratio'])
-                            obj_lst[code]['buy_price'] = cur_prc
-                            obj_lst[code]['buy_avg_price'] = ((bp * (qr - 1)) + cur_prc) / qr
+                            obj_lst[code]['buy_price'] = ((bp * (qr - 1)) + cur_prc) / qr
                             obj_lst[code]['quantity_ratio'] = qr + 1
                         else:
                             obj_lst[code] = {
                                 'bool_buy': True,
                                 'buy_price': cur_prc,
-                                'buy_avg_price': cur_prc,
                                 'quantity_ratio': 2,
                                 'bool_sell': False,
                                 '70_position': ''
@@ -95,7 +91,7 @@ class BotBinance():
 
                     if obj_lst[code]['bool_buy'] == True:
 
-                        bp = float(copy.deepcopy(obj_lst[code]['buy_avg_price']))
+                        bp = float(copy.deepcopy(obj_lst[code]['buy_price']))
                         qr = copy.deepcopy(obj_lst[code]['quantity_ratio'])
                         bs = copy.deepcopy(obj_lst[code]['bool_sell'])
                         p7 = copy.deepcopy(obj_lst[code]['70_position'])
@@ -105,7 +101,6 @@ class BotBinance():
                             obj_lst[code] = {
                                 'bool_buy': False,
                                 'buy_price': 0,
-                                'buy_avg_price': 0,
                                 'quantity_ratio': 0,
                                 'bool_sell': False,
                                 '70_position': ''
@@ -120,7 +115,6 @@ class BotBinance():
                                 obj_lst[code] = {
                                     'bool_buy': False,
                                     'buy_price': 0,
-                                    'buy_avg_price': 0,
                                     'quantity_ratio': 0,
                                     'bool_sell': False,
                                     '70_position': ''
@@ -157,7 +151,7 @@ class BotBinance():
 
         tn_tt = datetime.datetime.now()
 
-        if tn_tt.hour == 9 and tn_tt.minute == 2 and (30 <= tn_tt.second < 35):
+        if tn_tt.hour == 8 and tn_tt.minute == 57 and (30 <= tn_tt.second < 35):
             self.top_tier()
             self.t_l = load_file(FILE_URL_TPTR_3M)
             line_message(f'BotBinance \nToday Top Tier List \n{self.t_l}')
