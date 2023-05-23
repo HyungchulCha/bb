@@ -18,7 +18,7 @@ UB_SECRET_KEY_AWS = '3x0vv6PyRzm1wRczWqxYqdHmQRgEP0OczHijCveB'
 UB_IP_AWS = '43.201.99.220'
 
 LINE_URL = 'https://notify-api.line.me/api/notify'
-LINE_TOKEN = '48zl8RmuB0lZoPOoVmqowZzjsUE0P53JO7jfVFCyLwh'
+LINE_TOKEN = 'rw8vyo0yRdHqrZfQBvfxd6rKwPEXYoZgZw47yJqG6Op'
 
 FILE_URL = DIRECTORY + '/_d'
 FILE_URL_BLNC_3M = FILE_URL + '/BalanceList.pickle'
