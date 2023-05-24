@@ -50,7 +50,7 @@ class BotBinance():
 
         for code in tks:
 
-            df = self.strategy_rsi(self.gen_bnc_df(code, '5m', 12*24*3))
+            df = self.strategy_rsi(self.gen_bnc_df(code, '5m', 12*24))
 
             obj_lst[code] = {
                 'bool_buy': False,
@@ -131,7 +131,7 @@ class BotBinance():
         pft_df = pft_df.loc[(pft_df['profit'] > 0)]
         pft_df = pft_df.sort_values('profit', ascending=False)
         print(pft_df)
-        ttr_li = pft_df.head(100)['code'].to_list()
+        ttr_li = pft_df.head(80)['code'].to_list()
         save_file(FILE_URL_TPTR_3M, ttr_li)
 
     
@@ -153,7 +153,7 @@ class BotBinance():
 
         tn_tt = datetime.datetime.now()
 
-        if tn_tt.hour == 8 and tn_tt.minute == 57 and (30 <= tn_tt.second < 35):
+        if ((tn_tt.hour % 12) == 8) and tn_tt.minute == 57 and (30 <= tn_tt.second < 35):
             self.top_tier()
             self.t_l = load_file(FILE_URL_TPTR_3M)
             line_message(f'BotBinance \nToday Top-Tier \n{self.t_l}')
@@ -194,6 +194,8 @@ class BotBinance():
         int_prc_ttl = int(self.prc_ttl)
         int_prc_lmt = int(self.prc_lmt)
         len_bal_lst = len(self.b_l)
+
+        print(self.r_l)
 
         line_message(f'BotBinance \nT : {int_prc_ttl:,} USDT \nR : {int_rel_ttl:,} USDT \nL : {int_prc_lmt:,} USDT \nS : {len_bal_lst}')
 
