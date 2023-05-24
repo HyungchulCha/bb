@@ -297,7 +297,7 @@ class BotBinance():
                     bq = float(self.prc_buy / cur_prc)
                     bq = round(bq, 8)
 
-                    if psb_ord and (not rmn_sym):
+                    if psb_ord and ((not rmn_sym) or (rmn_sym and (self.o_l[symbol]['bool_buy'] == True))):
                         res = self.bnc.create_market_buy_order(symbol=symbol, amount=bq)
                         if res['info']['status'] == 'FILLED':
                             bb = copy.deepcopy(self.o_l[symbol]['bool_buy'])
