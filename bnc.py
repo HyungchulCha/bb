@@ -130,6 +130,7 @@ class BotBinance():
         pft_df = pd.DataFrame({'code': sym_arr, 'profit': pft_arr})
         pft_df = pft_df.loc[(pft_df['profit'] > 0)]
         pft_df = pft_df.sort_values('profit', ascending=False)
+        print(pft_df)
         ttr_li = pft_df.head(100)['code'].to_list()
         save_file(FILE_URL_TPTR_3M, ttr_li)
 
@@ -167,7 +168,7 @@ class BotBinance():
         self.b_l = list(set(self.q_l + bal_lst))
         self.r_l = list(set(bal_lst).difference(self.q_l))
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
-        self.prc_ttl = 18100 * 0.8
+        self.prc_ttl = 16500
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
         prc_buy = self.prc_ttl / (len(self.q_l) * 6)
         self.prc_buy = prc_buy if prc_buy > self.const_dn else self.const_dn
@@ -189,11 +190,12 @@ class BotBinance():
         if self.prc_lmt < self.prc_buy:
             line_message('BotBinance Insufficient Balance !!!')
 
+        int_rel_ttl = int(prc_ttl)
         int_prc_ttl = int(self.prc_ttl)
         int_prc_lmt = int(self.prc_lmt)
         len_bal_lst = len(self.b_l)
 
-        line_message(f'BotBinance \nT : {int_prc_ttl:,} USDT \nL : {int_prc_lmt:,} USDT \nS : {len_bal_lst}')
+        line_message(f'BotBinance \nT : {int_prc_ttl:,} USDT \nR : {int_rel_ttl:,} \nL : {int_prc_lmt:,} USDT \nS : {len_bal_lst}')
 
         __tn = datetime.datetime.now()
         __tn_min = __tn.minute % 5
