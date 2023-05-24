@@ -195,7 +195,7 @@ class BotBinance():
         int_prc_lmt = int(self.prc_lmt)
         len_bal_lst = len(self.b_l)
 
-        line_message(f'BotBinance \nT : {int_prc_ttl:,} USDT \nR : {int_rel_ttl:,} \nL : {int_prc_lmt:,} USDT \nS : {len_bal_lst}')
+        line_message(f'BotBinance \nT : {int_prc_ttl:,} USDT \nR : {int_rel_ttl:,} USDT \nL : {int_prc_lmt:,} USDT \nS : {len_bal_lst}')
 
         __tn = datetime.datetime.now()
         __tn_min = __tn.minute % 5
