@@ -358,7 +358,8 @@ class BotBinance():
         str_start = _tn.strftime('%Y/%m/%d %H:%M:%S')
         str_end = __tn.strftime('%Y/%m/%d %H:%M:%S')
 
-        line_message(f'BotBinance \nS : {str_start} \nE : {str_end} {cur_pft_text} {sel_txt}')
+        # line_message(f'BotBinance \nS : {str_start} \nE : {str_end} {cur_pft_text} {sel_txt}')
+        line_message(f'BotBinance \nS : {str_start} \nE : {str_end} {sel_txt}')
     
 
     # Tiker Data Init
