@@ -388,7 +388,7 @@ class BotBinance():
             :
                 
                 _tks = self.bnc.fetch_ticker(mk)
-                if float(_tks['info']['priceChangePercent']) > 0:
+                if float(_tks['info']['priceChangePercent']) >= 1:
                     tks.append({'t': mk, 'c': float(_tks['info']['priceChangePercent'])})
 
                 # if not init:
@@ -397,10 +397,10 @@ class BotBinance():
                 # else:
                 #     tks.append(mk)
 
-        if len(tks) > 100:
-            _lst = sorted(tks, key=lambda t: t['c'])[-100:]
-        else:
-            _lst = sorted(tks, key=lambda t: t['c'])
+        # if len(tks) > 100:
+        #     _lst = sorted(tks, key=lambda t: t['c'])[-100:]
+        # else:
+        _lst = sorted(tks, key=lambda t: t['c'])[::-1]
 
         lst = [l['t'] for l in _lst]
 
