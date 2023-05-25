@@ -151,12 +151,12 @@ class BotBinance():
 
             self.bool_balance = True
 
-        tn_tt = datetime.datetime.now()
+        # tn_tt = datetime.datetime.now()
 
-        if ((tn_tt.hour % 3) == 2) and tn_tt.minute == 57 and (30 <= tn_tt.second < 35):
-            self.top_tier()
-            self.t_l = load_file(FILE_URL_TPTR_3M)
-            line_message(f'BotBinance \nToday Top-Tier \n{self.t_l}')
+        # if ((tn_tt.hour % 3) == 2) and tn_tt.minute == 57 and (30 <= tn_tt.second < 35):
+        #     self.top_tier()
+        #     self.t_l = load_file(FILE_URL_TPTR_3M)
+        #     line_message(f'BotBinance \nToday Top-Tier \n{self.t_l}')
 
         print('##############################')
 
@@ -374,7 +374,7 @@ class BotBinance():
 
 
     # Spot, USDT Filter Ticker
-    def get_filter_ticker(self, init=False):
+    def get_filter_ticker(self):
         mks = self.bnc.load_markets()
         tks = []
 
@@ -386,11 +386,16 @@ class BotBinance():
             mks[mk]['info']['isSpotTradingAllowed'] == True and \
             'SPOT' in mks[mk]['info']['permissions'] \
             :
-                if not init:
-                    if mk in self.t_l:
-                        tks.append(mk)
-                else:
+                
+                _tks = self.bnc.fetch_ticker(mk)
+                if float(_tks['info']['priceChangePercent']) > 0:
                     tks.append(mk)
+
+                # if not init:
+                #     if mk in self.t_l:
+                #         tks.append(mk)
+                # else:
+                #     tks.append(mk)
 
         return tks
     
