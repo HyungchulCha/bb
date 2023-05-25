@@ -388,7 +388,7 @@ class BotBinance():
             :
                 
                 _tks = self.bnc.fetch_ticker(mk)
-                if float(_tks['info']['priceChangePercent']) >= 1:
+                if float(_tks['info']['priceChangePercent']) > 0:
                     tks.append({'t': mk, 'c': float(_tks['info']['priceChangePercent'])})
 
                 # if not init:
