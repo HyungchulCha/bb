@@ -223,6 +223,7 @@ class BotBinance():
 
         _, _, bal_lst, _ = self.get_balance_info()
         sel_lst = []
+        cur_pft = []
 
         for symbol in self.b_l:
 
@@ -246,6 +247,12 @@ class BotBinance():
                 psb_sel = (bal_sym and (cur_prc * bal_lst[symbol]['b'] > self.const_dn))
                 bb = copy.deepcopy(self.o_l[symbol]['bool_buy'])
                 nt = bb and ((not bal_sym) or (bal_sym and (cur_prc * bal_lst[symbol]['b'] < self.const_dn)))
+
+                if bb:
+                    _bp = copy.deepcopy(self.o_l[symbol]['buy_price'])
+                    _cur_ror = get_ror(_bp, cur_prc)
+                    _cur_ror = round(_cur_ror, 4)
+                    cur_pft.append(f'{symbol} : {_cur_ror}')
 
                 if nt:
                     self.get_tiker_data_init(symbol)
@@ -332,6 +339,15 @@ class BotBinance():
         for sl in sel_lst:
             sel_txt = sel_txt + '\n' + str(sl['c']) + ' : ' + str(sl['r'])
 
+        cur_pft_frst = True
+        cur_pft_text = ''
+        for cp in cur_pft:
+            if cur_pft_frst:
+                cur_pft_text = cur_pft_text + '\n' + cp
+                cur_pft_frst = False
+            else:
+                cur_pft_text = cur_pft_text + ' / ' + cp
+
         __tn = datetime.datetime.now()
         __tn_min = __tn.minute % 5
         __tn_sec = __tn.second
@@ -342,7 +358,7 @@ class BotBinance():
         str_start = _tn.strftime('%Y/%m/%d %H:%M:%S')
         str_end = __tn.strftime('%Y/%m/%d %H:%M:%S')
 
-        line_message(f'BotBinance \nS : {str_start} \nE : {str_end} {sel_txt}')
+        line_message(f'BotBinance \nS : {str_start} \nE : {str_end} {cur_pft_text} {sel_txt}')
     
 
     # Tiker Data Init
