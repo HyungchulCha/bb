@@ -168,7 +168,7 @@ class BotBinance():
         self.b_l = list(set(self.q_l + bal_lst))
         self.r_l = list(set(bal_lst).difference(self.q_l))
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
-        self.prc_ttl = 16000
+        self.prc_ttl = 17000
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
         prc_buy = self.prc_ttl / (len(self.q_l) * 4)
         self.prc_buy = prc_buy if prc_buy > self.const_dn else self.const_dn
@@ -193,11 +193,11 @@ class BotBinance():
         int_rel_ttl = int(prc_ttl)
         int_prc_ttl = int(self.prc_ttl)
         int_prc_lmt = int(self.prc_lmt)
-        len_bal_lst = len(self.b_l)
+        len_qnt_lst = len(self.q_l)
 
         print(self.r_l)
 
-        line_message(f'BotBinance \nT : {int_prc_ttl:,} USDT \nR : {int_rel_ttl:,} USDT \nL : {int_prc_lmt:,} USDT \nS : {len_bal_lst}')
+        line_message(f'BotBinance \nT : {int_prc_ttl:,} USDT \nR : {int_rel_ttl:,} USDT \nL : {int_prc_lmt:,} USDT \nS : {len_qnt_lst}')
 
         __tn = datetime.datetime.now()
         __tn_min = __tn.minute % 5
