@@ -168,9 +168,9 @@ class BotBinance():
         self.b_l = list(set(self.q_l + bal_lst))
         self.r_l = list(set(bal_lst).difference(self.q_l))
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
-        self.prc_ttl = 17000
+        self.prc_ttl = 17500
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
-        prc_buy = self.prc_ttl / (len(self.q_l) * 2)
+        prc_buy = self.prc_ttl / 300
         self.prc_buy = prc_buy if prc_buy > self.const_dn else self.const_dn
 
         if os.path.isfile(FILE_URL_TIKR_3M):
@@ -194,8 +194,6 @@ class BotBinance():
         int_prc_ttl = int(self.prc_ttl)
         int_prc_lmt = int(self.prc_lmt)
         len_qnt_lst = len(self.q_l)
-
-        print(self.r_l)
 
         line_message(f'BotBinance \nT : {int_prc_ttl:,} USDT \nR : {int_rel_ttl:,} USDT \nL : {int_prc_lmt:,} USDT \nS : {len_qnt_lst}')
 
@@ -403,7 +401,6 @@ class BotBinance():
         #     _lst = sorted(tks, key=lambda t: t['c'])[-100:]
         # else:
         _lst = sorted(tks, key=lambda t: t['c'])[::-1]
-
         lst = [l['t'] for l in _lst]
 
         return lst
