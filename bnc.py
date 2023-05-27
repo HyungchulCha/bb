@@ -329,9 +329,9 @@ class BotBinance():
 
 
         save_file(FILE_URL_TIKR_3M, self.o_l)
-        for o in self.o_l:
-            if self.o_l[o]['bool_buy'] == True:
-                print(o, self.o_l[o])
+        # for o in self.o_l:
+        #     if self.o_l[o]['bool_buy'] == True:
+        #         print(o, self.o_l[o])
 
         sel_txt = ''
         for sl in sel_lst:
