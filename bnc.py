@@ -170,7 +170,7 @@ class BotBinance():
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
         self.prc_ttl = 17500
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
-        prc_buy = self.prc_ttl / 300
+        prc_buy = self.prc_ttl / 500
         self.prc_buy = prc_buy if prc_buy > self.const_dn else self.const_dn
 
         if os.path.isfile(FILE_URL_TIKR_3M):
