@@ -24,6 +24,7 @@ class BotBinance():
         self.r_l = []
         self.t_l = []
         self.o_l = {}
+        self.x_l = ['AUD/USDT']
 
         self.time_order = None
         self.time_rebalance = None
@@ -299,10 +300,11 @@ class BotBinance():
                     
                     psb_ord = float(self.bnc.fetch_balance()['USDT']['free']) > self.prc_buy
                     rmn_sym = symbol in self.r_l
+                    del_sym = symbol in self.x_l
                     bq = float(self.prc_buy / cur_prc)
                     bq = round(bq, 8)
 
-                    if psb_ord and ((not rmn_sym) or (rmn_sym and (self.o_l[symbol]['bool_buy'] == True))):
+                    if psb_ord and (not del_sym) and ((not rmn_sym) or (rmn_sym and (self.o_l[symbol]['bool_buy'] == True))):
                         res = self.bnc.create_market_buy_order(symbol=symbol, amount=bq)
                         if res['info']['status'] == 'FILLED':
                             bb = copy.deepcopy(self.o_l[symbol]['bool_buy'])
