@@ -387,25 +387,25 @@ class BotBinance():
             'SPOT' in mks[mk]['info']['permissions'] \
             :
                 
-                _tks = self.bnc.fetch_ticker(mk)
-                if float(_tks['info']['priceChangePercent']) > 0:
-                    tks.append({'t': mk, 'c': float(_tks['info']['priceChangePercent'])})
+                # _tks = self.bnc.fetch_ticker(mk)
+                # if float(_tks['info']['priceChangePercent']) > 0:
+                #     tks.append({'t': mk, 'c': float(_tks['info']['priceChangePercent'])})
 
         #         if not init:
         #             if mk in self.t_l:
         #                 tks.append(mk)
         #         else:
-        #             tks.append(mk)
+                tks.append(mk)
 
-        # return tks
+        return tks
 
         # if len(tks) > 100:
         #     _lst = sorted(tks, key=lambda t: t['c'])[-100:]
         # else:
-        _lst = sorted(tks, key=lambda t: t['c'])[::-1]
-        lst = [l['t'] for l in _lst]
+        # _lst = sorted(tks, key=lambda t: t['c'])[::-1]
+        # lst = [l['t'] for l in _lst]
 
-        return lst
+        # return lst
     
 
     # Strategy RSI
