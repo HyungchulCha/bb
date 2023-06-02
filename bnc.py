@@ -272,7 +272,7 @@ class BotBinance():
             'SPOT' in mks[mk]['info']['permissions'] \
             :
                 df = self.gen_bnc_df(mk, '5m', 120)
-                if not (df is None) and (not (1 in df['same'])):
+                if not (df is None) and (not (1 in df['same'].to_list())):
                     tks.append(mk)
                 # _tks = self.bnc.fetch_ticker(mk)
                 # if float(_tks['info']['priceChangePercent']) > 0:
