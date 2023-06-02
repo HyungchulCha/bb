@@ -259,9 +259,10 @@ class BotBinance():
 
 
     # Spot, USDT Filter Ticker
-    def get_filter_ticker(self, init=False):
+    def get_filter_ticker(self):
         mks = self.bnc.load_markets()
         tks = []
+        lst = []
 
         for mk in mks:
             if \
@@ -271,19 +272,14 @@ class BotBinance():
             mks[mk]['info']['isSpotTradingAllowed'] == True and \
             'SPOT' in mks[mk]['info']['permissions'] \
             :
-                df = self.gen_bnc_df(mk, '5m', 120)
-                if not (df is None) and (not (1 in df['same'].to_list())):
-                    tks.append(mk)
-                # _tks = self.bnc.fetch_ticker(mk)
-                # if float(_tks['info']['priceChangePercent']) > 0:
-                #     tks.append({'t': mk, 'c': float(_tks['info']['priceChangePercent'])})
+                tks.append(mk)
+
+        for tk in tks:
+            df = self.gen_bnc_df(tk, '5m', 120)
+            if (not (df is None)) and (not (1 in df['same'].to_list())):
+                lst.append(tk)
                 
-        return tks
-
-        # _lst = sorted(tks, key=lambda t: t['c'])[::-1]
-        # lst = [l['t'] for l in _lst]
-
-        # return lst
+        return lst
     
 
     # Strategy RSI
