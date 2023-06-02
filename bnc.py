@@ -136,97 +136,93 @@ class BotBinance():
                 bbw = dfh['BBW'].iloc[-1]
                 cur_prc = float(dfh['close'].iloc[-1])
 
-                is_same = 1 in dfh['same'].to_list()
+                str_rsi = round(rsi, 2)
+                str_rsi_prv = round(rsi_prv, 2)
+                str_vol_osc = round(vol_osc, 2)
+                str_bbw = round(bbw, 2)
+                print(f'{symbol}\t: RSI - {str_rsi}\t, RSI_P - {str_rsi_prv}\t, VO - {str_vol_osc}\t, BBW - {str_bbw}')
+                
+                
+                bal_sym = symbol in bal_lst
+                psb_sel = (bal_sym and (cur_prc * bal_lst[symbol]['b'] > self.const_dn))
+                bb = copy.deepcopy(self.o_l[symbol]['bool_buy'])
+                nt = bb and ((not bal_sym) or (bal_sym and (cur_prc * bal_lst[symbol]['b'] < self.const_dn)))
 
-                if not is_same:
+                if nt:
+                    self.get_tiker_data_init(symbol)
 
-                    str_rsi = round(rsi, 2)
-                    str_rsi_prv = round(rsi_prv, 2)
-                    str_vol_osc = round(vol_osc, 2)
-                    str_bbw = round(bbw, 2)
-                    print(f'{symbol}\t: RSI - {str_rsi}\t, RSI_P - {str_rsi_prv}\t, VO - {str_vol_osc}\t, BBW - {str_bbw}')
-                    
-                    
-                    bal_sym = symbol in bal_lst
-                    psb_sel = (bal_sym and (cur_prc * bal_lst[symbol]['b'] > self.const_dn))
-                    bb = copy.deepcopy(self.o_l[symbol]['bool_buy'])
-                    nt = bb and ((not bal_sym) or (bal_sym and (cur_prc * bal_lst[symbol]['b'] < self.const_dn)))
+                if psb_sel and bb:
+                    tb = copy.deepcopy(bal_lst[symbol]['b'])
+                    bp = copy.deepcopy(self.o_l[symbol]['buy_price'])
+                    qr = copy.deepcopy(self.o_l[symbol]['quantity_ratio'])
+                    bs = copy.deepcopy(self.o_l[symbol]['bool_sell'])
+                    p7 = copy.deepcopy(self.o_l[symbol]['70_position'])
+                    sq = (tb * (1 / qr))
+                    psb_sel_div = (cur_prc * sq) > self.const_dn
 
-                    if nt:
-                        self.get_tiker_data_init(symbol)
+                    if (not psb_sel_div) and qr > 1:
+                        sq = tb * (1 / (qr - 1))
 
-                    if psb_sel and bb:
-                        tb = copy.deepcopy(bal_lst[symbol]['b'])
-                        bp = copy.deepcopy(self.o_l[symbol]['buy_price'])
-                        qr = copy.deepcopy(self.o_l[symbol]['quantity_ratio'])
-                        bs = copy.deepcopy(self.o_l[symbol]['bool_sell'])
-                        p7 = copy.deepcopy(self.o_l[symbol]['70_position'])
-                        sq = (tb * (1 / qr))
-                        psb_sel_div = (cur_prc * sq) > self.const_dn
+                    tb = round(tb, 8)
+                    sq = round(sq, 8)
 
-                        if (not psb_sel_div) and qr > 1:
-                            sq = tb * (1 / (qr - 1))
+                    if rsi <= 50 and bs:
+                        res = self.bnc.create_market_sell_order(symbol=symbol, amount=tb)
+                        if res['info']['status'] == 'FILLED':
+                            self.get_tiker_data_init(symbol)
+                            _ror = get_ror(bp, cur_prc)
+                            print(f'Sell - Symbol: {symbol}, Profit: {round(_ror, 4)}')
+                            sel_lst.append({'c': '[E] ' + symbol, 'r': round(_ror, 4)})
 
-                        tb = round(tb, 8)
-                        sq = round(sq, 8)
+                    elif rsi >= 70 and ((p7 == '70_down') or (p7 == '70_up' and (rsi_prv <= rsi))):
+                        res = self.bnc.create_market_sell_order(symbol=symbol, amount=sq)
+                        if res['info']['status'] == 'FILLED':
+                            self.o_l[symbol]['quantity_ratio'] = qr - 1
+                            self.o_l[symbol]['bool_sell'] = True
 
-                        if rsi <= 50 and bs:
-                            res = self.bnc.create_market_sell_order(symbol=symbol, amount=tb)
-                            if res['info']['status'] == 'FILLED':
+                            if (not psb_sel_div) and qr > 1:
+                                self.o_l[symbol]['quantity_ratio'] = qr - 2
+
+                            if self.o_l[symbol]['quantity_ratio'] == 0:
                                 self.get_tiker_data_init(symbol)
-                                _ror = get_ror(bp, cur_prc)
-                                print(f'Sell - Symbol: {symbol}, Profit: {round(_ror, 4)}')
-                                sel_lst.append({'c': '[E] ' + symbol, 'r': round(_ror, 4)})
 
-                        elif rsi >= 70 and ((p7 == '70_down') or (p7 == '70_up' and (rsi_prv <= rsi))):
-                            res = self.bnc.create_market_sell_order(symbol=symbol, amount=sq)
-                            if res['info']['status'] == 'FILLED':
-                                self.o_l[symbol]['quantity_ratio'] = qr - 1
-                                self.o_l[symbol]['bool_sell'] = True
-
-                                if (not psb_sel_div) and qr > 1:
-                                    self.o_l[symbol]['quantity_ratio'] = qr - 2
-
-                                if self.o_l[symbol]['quantity_ratio'] == 0:
-                                    self.get_tiker_data_init(symbol)
-
-                                _ror = get_ror(bp, cur_prc)
-                                print(f'Sell - Symbol: {symbol}, Profit: {round(_ror, 4)}')
-                                sel_lst.append({'c': '[S] ' + symbol, 'r': round(_ror, 4)})
-                            
-
-                    if (rsi <= 30) and (rsi_prv > rsi) and (vol_osc > 0) and (bbw >= 0.01):
+                            _ror = get_ror(bp, cur_prc)
+                            print(f'Sell - Symbol: {symbol}, Profit: {round(_ror, 4)}')
+                            sel_lst.append({'c': '[S] ' + symbol, 'r': round(_ror, 4)})
                         
-                        psb_ord = float(self.bnc.fetch_balance()['USDT']['free']) > self.prc_buy
-                        rmn_sym = symbol in self.r_l
-                        del_sym = symbol in self.x_l
-                        bq = float(self.prc_buy / cur_prc)
-                        bq = round(bq, 8)
 
-                        if psb_ord and (not del_sym) and ((not rmn_sym) or (rmn_sym and (self.o_l[symbol]['bool_buy'] == True))):
-                            res = self.bnc.create_market_buy_order(symbol=symbol, amount=bq)
-                            if res['info']['status'] == 'FILLED':
-                                bb = copy.deepcopy(self.o_l[symbol]['bool_buy'])
-                                bp = copy.deepcopy(self.o_l[symbol]['buy_price'])
-                                qr = copy.deepcopy(self.o_l[symbol]['quantity_ratio'])
+                if (rsi <= 30) and (rsi_prv > rsi) and (vol_osc > 0) and (bbw >= 0.01):
+                    
+                    psb_ord = float(self.bnc.fetch_balance()['USDT']['free']) > self.prc_buy
+                    rmn_sym = symbol in self.r_l
+                    del_sym = symbol in self.x_l
+                    bq = float(self.prc_buy / cur_prc)
+                    bq = round(bq, 8)
 
-                                if bb:
-                                    self.o_l[symbol]['buy_price'] = ((bp * (qr - 1)) + cur_prc) / qr
-                                    self.o_l[symbol]['quantity_ratio'] = qr + 1
-                                else:
-                                    self.o_l[symbol] = {
-                                        'bool_buy': True,
-                                        'buy_price': cur_prc,
-                                        'quantity_ratio': 2,
-                                        'bool_sell': False,
-                                        '70_position': ''
-                                    }
+                    if psb_ord and (not del_sym) and ((not rmn_sym) or (rmn_sym and (self.o_l[symbol]['bool_buy'] == True))):
+                        res = self.bnc.create_market_buy_order(symbol=symbol, amount=bq)
+                        if res['info']['status'] == 'FILLED':
+                            bb = copy.deepcopy(self.o_l[symbol]['bool_buy'])
+                            bp = copy.deepcopy(self.o_l[symbol]['buy_price'])
+                            qr = copy.deepcopy(self.o_l[symbol]['quantity_ratio'])
 
-                                print(f'Buy - Symbol: {symbol}, Balance: {bq}')
-                                sel_lst.append({'c': '[B] ' + symbol, 'r': (bq)})
+                            if bb:
+                                self.o_l[symbol]['buy_price'] = ((bp * (qr - 1)) + cur_prc) / qr
+                                self.o_l[symbol]['quantity_ratio'] = qr + 1
+                            else:
+                                self.o_l[symbol] = {
+                                    'bool_buy': True,
+                                    'buy_price': cur_prc,
+                                    'quantity_ratio': 2,
+                                    'bool_sell': False,
+                                    '70_position': ''
+                                }
+
+                            print(f'Buy - Symbol: {symbol}, Balance: {bq}')
+                            sel_lst.append({'c': '[B] ' + symbol, 'r': (bq)})
 
 
-                    self.o_l[symbol]['70_position'] = '70_down' if rsi < 70 else '70_up'
+                self.o_l[symbol]['70_position'] = '70_down' if rsi < 70 else '70_up'
 
 
         save_file(FILE_URL_TIKR_3M, self.o_l)
@@ -275,11 +271,13 @@ class BotBinance():
             mks[mk]['info']['isSpotTradingAllowed'] == True and \
             'SPOT' in mks[mk]['info']['permissions'] \
             :
-                
+                df = self.gen_bnc_df(mk, '5m', 120)
+                if not (df is None) and (not (1 in df['same'])):
+                    tks.append(mk)
                 # _tks = self.bnc.fetch_ticker(mk)
                 # if float(_tks['info']['priceChangePercent']) > 0:
                 #     tks.append({'t': mk, 'c': float(_tks['info']['priceChangePercent'])})
-                tks.append(mk)
+                
         return tks
 
         # _lst = sorted(tks, key=lambda t: t['c'])[::-1]
