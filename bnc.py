@@ -397,15 +397,15 @@ class BotBinance():
         #         else:
                 # tks.append(mk)
 
-        return tks
+        # return tks
 
         # if len(tks) > 100:
         #     _lst = sorted(tks, key=lambda t: t['c'])[-100:]
         # else:
-        # _lst = sorted(tks, key=lambda t: t['c'])[::-1]
-        # lst = [l['t'] for l in _lst]
+        _lst = sorted(tks, key=lambda t: t['c'])[::-1]
+        lst = [l['t'] for l in _lst]
 
-        # return lst
+        return lst
     
 
     # Strategy RSI
