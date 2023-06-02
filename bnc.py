@@ -62,14 +62,15 @@ class BotBinance():
         self.bnc = ccxt.binance(config={'apiKey': self.access_key, 'secret': self.secret_key, 'enableRateLimit': True})
         
         # self.t_l = load_file(FILE_URL_TPTR_3M)
-        self.q_l = self.get_filter_ticker()
+        # self.q_l = self.get_filter_ticker()
+        self.q_l = ['MDT/USDT', 'ACH/USDT', 'LTC/USDT', 'SUI/USDT', 'MASK/USDT', 'FTM/USDT', 'FLOKI/USDT', 'ARB/USDT', 'COMBO/USDT', 'XRP/USDT', 'JOE/USDT', 'GALA/USDT', 'ETH/USDT', 'APT/USDT', 'TOMO/USDT', 'LINK/USDT', 'RNDR/USDT', 'GRT/USDT', 'CFX/USDT', 'DOGE/USDT', 'HIGH/USDT', 'FIL/USDT', 'BTC/USDT', 'PHB/USDT', 'ICP/USDT', 'MAGIC/USDT', 'LUNA/USDT', 'SHIB/USDT', 'OCEAN/USDT', 'ADA/USDT', 'FET/USDT', 'BUSD/USDT', 'LINA/USDT', 'EDU/USDT', 'YFI/USDT', 'HOOK/USDT', 'DOT/USDT', 'LUNC/USDT', 'SAND/USDT', 'SXP/USDT', 'JASMY/USDT', 'ID/USDT', 'TRX/USDT', 'TUSD/USDT', 'USDC/USDT', 'SOL/USDT', 'ARPA/USDT', 'CAKE/USDT', 'MANA/USDT', 'OP/USDT', 'KEY/USDT', 'INJ/USDT', 'MATIC/USDT', 'ATOM/USDT', 'BNB/USDT', 'AGIX/USDT']
         prc_ttl, prc_lmt, _, bal_lst  = self.get_balance_info()
         self.b_l = list(set(self.q_l + bal_lst))
         self.r_l = list(set(bal_lst).difference(self.q_l))
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
         self.prc_ttl = 20000
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
-        prc_buy = self.prc_ttl / 800
+        prc_buy = self.prc_ttl / 450
         self.prc_buy = prc_buy if prc_buy > self.const_dn else self.const_dn
 
         if os.path.isfile(FILE_URL_TIKR_3M):
