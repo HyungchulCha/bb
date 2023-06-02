@@ -139,7 +139,7 @@ class BotBinance():
                 str_rsi_prv = round(rsi_prv, 2)
                 str_vol_osc = round(vol_osc, 2)
                 str_bbw = round(bbw, 2)
-                print(f'{symbol} : RSI - {str_rsi}, RSI_P - {str_rsi_prv}, VO - {str_vol_osc}, BBW - {str_bbw}')
+                print(f'{symbol}\t: RSI - {str_rsi}\t, RSI_P - {str_rsi_prv}\t, VO - {str_vol_osc}\t, BBW - {str_bbw}')
                 
                 
                 bal_sym = symbol in bal_lst
