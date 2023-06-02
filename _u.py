@@ -10,6 +10,14 @@ import ccxt
 
 # Indicator
 
+def indicator_bollinger_band_width(data, n=20, k=2):
+    data['MA'] = data['close'].rolling(window=n).mean()
+    data['Std'] = data['close'].rolling(window=n).std()
+    data['UpperBand'] = data['MA'] + (k * data['Std'])
+    data['LowerBand'] = data['MA'] - (k * data['Std'])
+    data['BBW'] = (data['UpperBand'] - data['LowerBand']) / data['MA']
+    return data
+
 def indicator_fibonacci(pb, ph):
     
     pzr = (ph - pb * 1.618) / (1 - 1.618)

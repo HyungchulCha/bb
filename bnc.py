@@ -69,7 +69,7 @@ class BotBinance():
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
         self.prc_ttl = 20000
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
-        prc_buy = self.prc_ttl / 900
+        prc_buy = self.prc_ttl / 800
         self.prc_buy = prc_buy if prc_buy > self.const_dn else self.const_dn
 
         if os.path.isfile(FILE_URL_TIKR_3M):
@@ -93,8 +93,6 @@ class BotBinance():
         int_prc_ttl = int(self.prc_ttl)
         int_prc_lmt = int(self.prc_lmt)
         len_qnt_lst = len(self.q_l)
-
-        print(self.r_l)
 
         line_message(f'BotBinance \nT : {int_prc_ttl:,} USDT \nR : {int_rel_ttl:,} USDT \nL : {int_prc_lmt:,} USDT \nS : {len_qnt_lst}')
 
@@ -133,12 +131,14 @@ class BotBinance():
                 rsi = dfh['rsi'].iloc[-1]
                 rsi_prv = dfh['rsi_prev'].iloc[-1]
                 vol_osc = dfh['volume_osc'].iloc[-1]
+                bbw = dfh['BBW'].iloc[-1]
                 cur_prc = float(dfh['close'].iloc[-1])
 
                 str_rsi = round(rsi, 2)
                 str_rsi_prv = round(rsi_prv, 2)
                 str_vol_osc = round(vol_osc, 2)
-                print(f'{symbol} : RSI - {str_rsi}, RSI_P - {str_rsi_prv}, VO - {str_vol_osc}')
+                str_bbw = round(bbw, 2)
+                print(f'{symbol} : RSI - {str_rsi}, RSI_P - {str_rsi_prv}, VO - {str_vol_osc}, BBW - {str_bbw}')
                 
                 
                 bal_sym = symbol in bal_lst
@@ -189,7 +189,7 @@ class BotBinance():
                             sel_lst.append({'c': '[S] ' + symbol, 'r': round(_ror, 4)})
                         
 
-                if (rsi <= 30) and (rsi_prv > rsi) and (vol_osc > 0):
+                if (rsi <= 30) and (rsi_prv > rsi) and (vol_osc > 0) and (bbw >= 0.01):
                     
                     psb_ord = float(self.bnc.fetch_balance()['USDT']['free']) > self.prc_buy
                     rmn_sym = symbol in self.r_l
@@ -273,7 +273,7 @@ class BotBinance():
                 _tks = self.bnc.fetch_ticker(mk)
                 if float(_tks['info']['priceChangePercent']) > 0:
                     tks.append({'t': mk, 'c': float(_tks['info']['priceChangePercent'])})
-                    
+
         _lst = sorted(tks, key=lambda t: t['c'])[::-1]
         lst = [l['t'] for l in _lst]
 
@@ -286,7 +286,7 @@ class BotBinance():
             df['rsi'] = indicator_rsi(df['close'], 14)
             df['rsi_prev'] = df['rsi'].shift()
             df['volume_osc'] = indicator_volume_oscillator(df['volume'], 5, 10)
-            return df
+            return indicator_bollinger_band_width(df)
     
 
     # Generate Dataframe
@@ -315,7 +315,7 @@ class BotBinance():
             free = float(bl['free'])
             asst = bl['asset']
             tikr = asst + '/USDT'
-            if free > 0 and asst != 'USDT' and asst != 'COMBO':
+            if free > 0 and asst != 'USDT':
                 obj[tikr] = {
                     'b': free,
                 }
