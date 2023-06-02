@@ -38,7 +38,7 @@ class BotBinance():
         self.prc_buy = 0
 
         self.const_up = 375000
-        self.const_dn = 12.5
+        self.const_dn = 11
 
 
     def top_tier(self):
@@ -163,7 +163,7 @@ class BotBinance():
 
         self.bnc = ccxt.binance(config={'apiKey': self.access_key, 'secret': self.secret_key, 'enableRateLimit': True})
         
-        self.t_l = load_file(FILE_URL_TPTR_3M)
+        # self.t_l = load_file(FILE_URL_TPTR_3M)
         self.q_l = self.get_filter_ticker()
         prc_ttl, prc_lmt, _, bal_lst  = self.get_balance_info()
         self.b_l = list(set(self.q_l + bal_lst))
@@ -171,7 +171,7 @@ class BotBinance():
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
         self.prc_ttl = 20000
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
-        prc_buy = self.prc_ttl / 800
+        prc_buy = self.prc_ttl / 900
         self.prc_buy = prc_buy if prc_buy > self.const_dn else self.const_dn
 
         if os.path.isfile(FILE_URL_TIKR_3M):
@@ -387,15 +387,15 @@ class BotBinance():
             'SPOT' in mks[mk]['info']['permissions'] \
             :
                 
-                # _tks = self.bnc.fetch_ticker(mk)
-                # if float(_tks['info']['priceChangePercent']) > 0:
-                #     tks.append({'t': mk, 'c': float(_tks['info']['priceChangePercent'])})
+                _tks = self.bnc.fetch_ticker(mk)
+                if float(_tks['info']['priceChangePercent']) > 0:
+                    tks.append({'t': mk, 'c': float(_tks['info']['priceChangePercent'])})
 
         #         if not init:
         #             if mk in self.t_l:
         #                 tks.append(mk)
         #         else:
-                tks.append(mk)
+                # tks.append(mk)
 
         return tks
 
@@ -443,7 +443,7 @@ class BotBinance():
             free = float(bl['free'])
             asst = bl['asset']
             tikr = asst + '/USDT'
-            if free > 0 and asst != 'USDT':
+            if free > 0 and asst != 'USDT' and asst != 'COMBO':
                 obj[tikr] = {
                     'b': free,
                 }
