@@ -62,9 +62,7 @@ class BotBinance():
 
         self.bnc = ccxt.binance(config={'apiKey': self.access_key, 'secret': self.secret_key, 'enableRateLimit': True})
         
-        # self.t_l = load_file(FILE_URL_TPTR_3M)
         self.q_l = self.get_filter_ticker()
-        # self.q_l = ['MDT/USDT', 'ACH/USDT', 'LTC/USDT', 'SUI/USDT', 'MASK/USDT', 'FTM/USDT', 'FLOKI/USDT', 'ARB/USDT', 'COMBO/USDT', 'XRP/USDT', 'JOE/USDT', 'GALA/USDT', 'ETH/USDT', 'APT/USDT', 'TOMO/USDT', 'LINK/USDT', 'RNDR/USDT', 'GRT/USDT', 'CFX/USDT', 'DOGE/USDT', 'HIGH/USDT', 'FIL/USDT', 'BTC/USDT', 'PHB/USDT', 'ICP/USDT', 'MAGIC/USDT', 'LUNA/USDT', 'SHIB/USDT', 'OCEAN/USDT', 'ADA/USDT', 'FET/USDT', 'BUSD/USDT', 'LINA/USDT', 'EDU/USDT', 'YFI/USDT', 'HOOK/USDT', 'DOT/USDT', 'LUNC/USDT', 'SAND/USDT', 'SXP/USDT', 'JASMY/USDT', 'ID/USDT', 'TRX/USDT', 'TUSD/USDT', 'USDC/USDT', 'SOL/USDT', 'ARPA/USDT', 'CAKE/USDT', 'MANA/USDT', 'OP/USDT', 'KEY/USDT', 'INJ/USDT', 'MATIC/USDT', 'ATOM/USDT', 'BNB/USDT', 'AGIX/USDT']
         prc_ttl, prc_lmt, _, bal_lst  = self.get_balance_info()
         self.b_l = list(set(self.q_l + bal_lst))
         self.r_l = list(set(bal_lst).difference(self.q_l))
@@ -275,11 +273,12 @@ class BotBinance():
                 tks.append(mk)
 
         for tk in tks:
-            df = self.gen_bnc_df(tk, '5m', 120)
-            if (not (df is None)) and (not (1 in df['same'].to_list())):
-                lst.append(tk)
+            _df = self.gen_bnc_df(tk, '5m', 12*24*3)
+            if not _df is None:
+                if 1 in _df['same'].to_list():
+                    lst.append(tk)
                 
-        return lst
+        return list(set(tks).difference(lst))
     
 
     # Strategy RSI
