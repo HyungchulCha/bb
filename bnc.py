@@ -260,7 +260,6 @@ class BotBinance():
     def get_filter_ticker(self):
         mks = self.bnc.load_markets()
         tks = []
-        lst = []
 
         for mk in mks:
             if \
@@ -270,15 +269,11 @@ class BotBinance():
             mks[mk]['info']['isSpotTradingAllowed'] == True and \
             'SPOT' in mks[mk]['info']['permissions'] \
             :
-                tks.append(mk)
-
-        for tk in tks:
-            _df = self.gen_bnc_df(tk, '5m', 12*24*3)
-            if not _df is None:
-                if 1 in _df['same'].to_list():
-                    lst.append(tk)
+                _df = self.gen_bnc_df(mk, '5m', 12*24*3)
+                if (not (_df is None)) and (not (1 in _df['same'].to_list())):
+                    tks.append(mk)
                 
-        return list(set(tks).difference(lst))
+        return tks
     
 
     # Strategy RSI
