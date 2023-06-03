@@ -48,13 +48,13 @@ class BotBinance():
 
             tn = datetime.datetime.now()
             tn_0 = tn.replace(hour=0, minute=0, second=0)
-            tn_d = int(((tn - tn_0).seconds) % 300)
+            tn_d = int(((tn - tn_0).seconds) % 900)
             print(f'{tn_d} Second')
 
-            if tn_d <= 150:
-                time.sleep(300 - tn_d - 150)
+            if tn_d <= 450:
+                time.sleep(900 - tn_d - 450)
             else:
-                time.sleep(300 - tn_d + 150)
+                time.sleep(900 - tn_d + 450)
 
             self.bool_balance = True
 
@@ -69,7 +69,7 @@ class BotBinance():
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
         self.prc_ttl = 20000
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
-        prc_buy = self.prc_ttl / 450
+        prc_buy = self.prc_ttl / 250
         self.prc_buy = prc_buy if prc_buy > self.const_dn else self.const_dn
 
         if os.path.isfile(FILE_URL_TIKR_3M):
@@ -97,10 +97,10 @@ class BotBinance():
         line_message(f'BotBinance \nT : {int_prc_ttl:,} USDT \nR : {int_rel_ttl:,} USDT \nL : {int_prc_lmt:,} USDT \nS : {len_qnt_lst}')
 
         __tn = datetime.datetime.now()
-        __tn_min = __tn.minute % 5
+        __tn_min = __tn.minute % 15
         __tn_sec = __tn.second
 
-        self.time_rebalance = threading.Timer(300 - (60 * __tn_min) - __tn_sec + 150, self.init_per_day)
+        self.time_rebalance = threading.Timer(900 - (60 * __tn_min) - __tn_sec + 450, self.init_per_day)
         self.time_rebalance.start()
 
 
@@ -110,8 +110,8 @@ class BotBinance():
 
             tn = datetime.datetime.now()
             tn_0 = tn.replace(hour=0, minute=0, second=0)
-            tn_d = int(((tn - tn_0).seconds) % 300)
-            time.sleep(300 - tn_d)
+            tn_d = int(((tn - tn_0).seconds) % 900)
+            time.sleep(900 - tn_d)
             self.bool_order = True
 
         _tn = datetime.datetime.now()
@@ -123,7 +123,7 @@ class BotBinance():
 
         for symbol in self.b_l:
 
-            df = self.strategy_rsi(self.gen_bnc_df(symbol, '5m', 120))
+            df = self.strategy_rsi(self.gen_bnc_df(symbol, '15m', 120))
 
             if not (df is None):
                 
@@ -233,10 +233,10 @@ class BotBinance():
             sel_txt = sel_txt + '\n' + str(sl['c']) + ' : ' + str(sl['r'])
 
         __tn = datetime.datetime.now()
-        __tn_min = __tn.minute % 5
+        __tn_min = __tn.minute % 15
         __tn_sec = __tn.second
 
-        self.time_backtest = threading.Timer(300 - (60 * __tn_min) - __tn_sec, self.stock_order)
+        self.time_backtest = threading.Timer(900 - (60 * __tn_min) - __tn_sec, self.stock_order)
         self.time_backtest.start()
 
         str_start = _tn.strftime('%Y/%m/%d %H:%M:%S')
@@ -269,7 +269,7 @@ class BotBinance():
             mks[mk]['info']['isSpotTradingAllowed'] == True and \
             'SPOT' in mks[mk]['info']['permissions'] \
             :
-                _df = self.gen_bnc_df(mk, '5m', 12*24*3)
+                _df = self.gen_bnc_df(mk, '15m', 4*24*9)
                 if (not (_df is None)) and (not (1 in _df['same'].to_list())):
                     tks.append(mk)
                 
