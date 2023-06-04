@@ -166,6 +166,9 @@ class BotBinance():
                     tb = round(tb, 8)
                     sq = round(sq, 8)
 
+                    cur_pft = get_ror(bp, cur_prc)
+                    print(f'Current Profit : {symbol} - {cur_pft}')
+
                     if rsi <= 50 and bs:
                         res = self.bnc.create_market_sell_order(symbol=symbol, amount=tb)
                         if res['info']['status'] == 'FILLED':
