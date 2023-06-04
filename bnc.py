@@ -62,16 +62,14 @@ class BotBinance():
 
         self.bnc = ccxt.binance(config={'apiKey': self.access_key, 'secret': self.secret_key, 'enableRateLimit': True})
         
-        # self.t_l = load_file(FILE_URL_TPTR_3M)
         self.q_l = self.get_filter_ticker()
-        # self.q_l = ['MDT/USDT', 'ACH/USDT', 'LTC/USDT', 'SUI/USDT', 'MASK/USDT', 'FTM/USDT', 'FLOKI/USDT', 'ARB/USDT', 'COMBO/USDT', 'XRP/USDT', 'JOE/USDT', 'GALA/USDT', 'ETH/USDT', 'APT/USDT', 'TOMO/USDT', 'LINK/USDT', 'RNDR/USDT', 'GRT/USDT', 'CFX/USDT', 'DOGE/USDT', 'HIGH/USDT', 'FIL/USDT', 'BTC/USDT', 'PHB/USDT', 'ICP/USDT', 'MAGIC/USDT', 'LUNA/USDT', 'SHIB/USDT', 'OCEAN/USDT', 'ADA/USDT', 'FET/USDT', 'BUSD/USDT', 'LINA/USDT', 'EDU/USDT', 'YFI/USDT', 'HOOK/USDT', 'DOT/USDT', 'LUNC/USDT', 'SAND/USDT', 'SXP/USDT', 'JASMY/USDT', 'ID/USDT', 'TRX/USDT', 'TUSD/USDT', 'USDC/USDT', 'SOL/USDT', 'ARPA/USDT', 'CAKE/USDT', 'MANA/USDT', 'OP/USDT', 'KEY/USDT', 'INJ/USDT', 'MATIC/USDT', 'ATOM/USDT', 'BNB/USDT', 'AGIX/USDT']
         prc_ttl, prc_lmt, _, bal_lst  = self.get_balance_info()
         self.b_l = list(set(self.q_l + bal_lst))
         self.r_l = list(set(bal_lst).difference(self.q_l))
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
         self.prc_ttl = 20000
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
-        prc_buy = self.prc_ttl / 800
+        prc_buy = self.prc_ttl / 400
         self.prc_buy = prc_buy if prc_buy > self.const_dn else self.const_dn
 
         if os.path.isfile(FILE_URL_TIKR_3M):
@@ -117,11 +115,15 @@ class BotBinance():
             self.bool_order = True
 
         _tn = datetime.datetime.now()
+        _tn_hour = _tn.hour
 
         # self.get_remain_cancel(self.b_l)
 
         _, _, bal_lst, _ = self.get_balance_info()
         sel_lst = []
+
+        if 23 <= _tn_hour:
+            self.all_sell_order()
 
         for symbol in self.b_l:
 
@@ -192,9 +194,9 @@ class BotBinance():
                             _ror = get_ror(bp, cur_prc)
                             print(f'Sell - Symbol: {symbol}, Profit: {round(_ror, 4)}')
                             sel_lst.append({'c': '[S] ' + symbol, 'r': round(_ror, 4)})
-                        
+                
 
-                if (rsi <= 30) and (rsi_prv > rsi) and (vol_osc > 0) and (bbw >= 0.01):
+                if (rsi <= 30) and (rsi_prv > rsi) and (vol_osc > 0) and (9 <= _tn_hour < 21):
                     
                     psb_ord = float(self.bnc.fetch_balance()['USDT']['free']) > self.prc_buy
                     rmn_sym = symbol in self.r_l
@@ -275,15 +277,10 @@ class BotBinance():
             mks[mk]['info']['isSpotTradingAllowed'] == True and \
             'SPOT' in mks[mk]['info']['permissions'] \
             :
-                # tks.append(mk)
+
                 _tks = self.bnc.fetch_ticker(mk)
                 if float(_tks['info']['priceChangePercent']) > 0:
                     tks.append({'t': mk, 'c': float(_tks['info']['priceChangePercent'])})
-
-        # for tk in tks:
-        #     df = self.gen_bnc_df(tk, '5m', 120)
-        #     if (not (df is None)) and (not (1 in df['same'].to_list())):
-        #         lst.append(tk)
                 
         _lst = sorted(tks, key=lambda t: t['c'])[::-1]
         lst = [l['t'] for l in _lst]
@@ -365,23 +362,23 @@ class BotBinance():
 if __name__ == '__main__':
 
     bb = BotBinance()
-    # bb.init_per_day()
+    bb.init_per_day()
     # bb.stock_order()
-    # bb.all_sell_order()
+    bb.all_sell_order()
 
-    while True:
+    # while True:
 
-        try:
+    #     try:
 
-            tn = datetime.datetime.now()
-            tn_start = tn.replace(hour=0, minute=0, second=0)
+    #         tn = datetime.datetime.now()
+    #         tn_start = tn.replace(hour=0, minute=0, second=0)
 
-            if tn >= tn_start and bb.bool_start == False:
-                bb.init_per_day()
-                bb.stock_order()
-                bb.bool_start = True
+    #         if tn >= tn_start and bb.bool_start == False:
+    #             bb.init_per_day()
+    #             bb.stock_order()
+    #             bb.bool_start = True
 
-        except Exception as e:
+    #     except Exception as e:
 
-            line_message(f"BotBinance Error : {e}")
-            break
+    #         line_message(f"BotBinance Error : {e}")
+    #         break
