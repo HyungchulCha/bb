@@ -62,14 +62,16 @@ class BotBinance():
 
         self.bnc = ccxt.binance(config={'apiKey': self.access_key, 'secret': self.secret_key, 'enableRateLimit': True})
         
+        # self.t_l = load_file(FILE_URL_TPTR_3M)
         self.q_l = self.get_filter_ticker()
+        # self.q_l = ['MDT/USDT', 'ACH/USDT', 'LTC/USDT', 'SUI/USDT', 'MASK/USDT', 'FTM/USDT', 'FLOKI/USDT', 'ARB/USDT', 'COMBO/USDT', 'XRP/USDT', 'JOE/USDT', 'GALA/USDT', 'ETH/USDT', 'APT/USDT', 'TOMO/USDT', 'LINK/USDT', 'RNDR/USDT', 'GRT/USDT', 'CFX/USDT', 'DOGE/USDT', 'HIGH/USDT', 'FIL/USDT', 'BTC/USDT', 'PHB/USDT', 'ICP/USDT', 'MAGIC/USDT', 'LUNA/USDT', 'SHIB/USDT', 'OCEAN/USDT', 'ADA/USDT', 'FET/USDT', 'BUSD/USDT', 'LINA/USDT', 'EDU/USDT', 'YFI/USDT', 'HOOK/USDT', 'DOT/USDT', 'LUNC/USDT', 'SAND/USDT', 'SXP/USDT', 'JASMY/USDT', 'ID/USDT', 'TRX/USDT', 'TUSD/USDT', 'USDC/USDT', 'SOL/USDT', 'ARPA/USDT', 'CAKE/USDT', 'MANA/USDT', 'OP/USDT', 'KEY/USDT', 'INJ/USDT', 'MATIC/USDT', 'ATOM/USDT', 'BNB/USDT', 'AGIX/USDT']
         prc_ttl, prc_lmt, _, bal_lst  = self.get_balance_info()
         self.b_l = list(set(self.q_l + bal_lst))
         self.r_l = list(set(bal_lst).difference(self.q_l))
         self.prc_ttl = prc_ttl if prc_ttl < self.const_up else self.const_up
         self.prc_ttl = 20000
         self.prc_lmt = prc_lmt if prc_ttl < self.const_up else prc_lmt - (prc_ttl - self.const_up)
-        prc_buy = self.prc_ttl / 300
+        prc_buy = self.prc_ttl / 800
         self.prc_buy = prc_buy if prc_buy > self.const_dn else self.const_dn
 
         if os.path.isfile(FILE_URL_TIKR_3M):
@@ -260,6 +262,7 @@ class BotBinance():
     def get_filter_ticker(self):
         mks = self.bnc.load_markets()
         tks = []
+        lst = []
 
         for mk in mks:
             if \
@@ -269,11 +272,20 @@ class BotBinance():
             mks[mk]['info']['isSpotTradingAllowed'] == True and \
             'SPOT' in mks[mk]['info']['permissions'] \
             :
-                _df = self.gen_bnc_df(mk, '5m', 12*24*3)
-                if (not (_df is None)) and (not (1 in _df['same'].to_list())):
-                    tks.append(mk)
+                # tks.append(mk)
+                _tks = self.bnc.fetch_ticker(mk)
+                if float(_tks['info']['priceChangePercent']) > 0:
+                    tks.append({'t': mk, 'c': float(_tks['info']['priceChangePercent'])})
+
+        # for tk in tks:
+        #     df = self.gen_bnc_df(tk, '5m', 120)
+        #     if (not (df is None)) and (not (1 in df['same'].to_list())):
+        #         lst.append(tk)
                 
-        return tks
+        _lst = sorted(tks, key=lambda t: t['c'])[::-1]
+        lst = [l['t'] for l in _lst]
+
+        return lst
     
 
     # Strategy RSI
