@@ -119,11 +119,11 @@ class BotBinance():
 
         # self.get_remain_cancel(self.b_l)
 
-        _, _, bal_lst, _ = self.get_balance_info()
-        sel_lst = []
-
         if 23 <= _tn_hour:
             self.all_sell_order()
+
+        _, _, bal_lst, _ = self.get_balance_info()
+        sel_lst = []
 
         for symbol in self.b_l:
 
@@ -362,23 +362,23 @@ class BotBinance():
 if __name__ == '__main__':
 
     bb = BotBinance()
-    bb.init_per_day()
+    # bb.init_per_day()
     # bb.stock_order()
-    bb.all_sell_order()
+    # bb.all_sell_order()
 
-    # while True:
+    while True:
 
-    #     try:
+        try:
 
-    #         tn = datetime.datetime.now()
-    #         tn_start = tn.replace(hour=0, minute=0, second=0)
+            tn = datetime.datetime.now()
+            tn_start = tn.replace(hour=0, minute=0, second=0)
 
-    #         if tn >= tn_start and bb.bool_start == False:
-    #             bb.init_per_day()
-    #             bb.stock_order()
-    #             bb.bool_start = True
+            if tn >= tn_start and bb.bool_start == False:
+                bb.init_per_day()
+                bb.stock_order()
+                bb.bool_start = True
 
-    #     except Exception as e:
+        except Exception as e:
 
-    #         line_message(f"BotBinance Error : {e}")
-    #         break
+            line_message(f"BotBinance Error : {e}")
+            break
